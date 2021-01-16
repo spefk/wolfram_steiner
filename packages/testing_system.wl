@@ -3,13 +3,21 @@
 BeginPackage["TestingSystem`"];
 
 
+testFunction::usage                = "Evaluates <function> on <arguments> <it> times, and returns mean AbsoluteTime and value of final solution.";
+testFunctionRandom::usage          = "Evaluates <function> on <arguments> <it> times, where element <PLHDR> in List <arguments> marks argument, that must be filled (positionaly) by output of <randomGenerator>, that is evaluated on <generatorArguments> on each test iteration. Returns mean AbsoluteTime of computations.";
+testFunctionUndivided::usage       = "Breaks input to fit input of testFunction.";
+testFunctionRandomUndivided::usage = "Breaks input to fit input of testFunctionRandom. Where <fArgs> contains PLCHDR on positions, that must be filled by <generator> output.";
+tester::usage                      = ""
+testerRandom::usage                = ""
+
+
+Begin["`Private`"];
+
+
 Unprotect[PLCHDR];
 ClearAll[PLCHDR];
 PLCHDR=PLCHDR;
 Protect[PLCHDR];
-
-
-Begin["`Private`"];
 
 
 ClearAll[dismemberFunction]
@@ -25,19 +33,8 @@ setMarked[where_, values_] := ReplacePart[where, Thread[Position[where, PLCHDR]-
 setMarked[where_, values_] := Throw["WrongMarksNumber"]/;Count[where, PLCHDR]!=Length[values]
 
 
-End[];
-
-
-AppendTo[$ContextPath, "TestingSystem`Private`"];
-
-
 ClearAll[testFunction]
 
-testFunction::usage =
-"
-Evaluates <function> on <arguments> <it> times,
-and returns mean AbsoluteTime and value of final solution.
-";
 testFunction[
 function : _Symbol|_Function,
 arguments_List,
@@ -52,13 +49,6 @@ Table[AbsoluteTiming@function[Sequence@@arguments], it]&
 
 ClearAll[testFunctionRandom]
 
-testFunctionRandom::usage =
-"
-Evaluates <function> on <arguments> <it> times,
-where element <PLHDR> in List <arguments> marks argument, that must be filled (positionaly) by output of <randomGenerator>,
-that is evaluated on <generatorArguments> on each test iteration.
-Returns mean AbsoluteTime of computations.
-";
 testFunctionRandom[
 function        : _Symbol|_Function, arguments_List,
 randomGenerator : _Symbol|_Function, generatorArguments_List,
@@ -80,9 +70,6 @@ Table[AbsoluteTiming@func[rndGen[]], it]&
 
 ClearAll[testFunctionUndivided]
 
-testFunctionUndivided::usage =
-"Breaks input to fit input of testFunction.";
-
 SetAttributes[testFunctionUndivided, HoldAll]
 testFunctionUndivided[function_[fArgs___, fOpts___Rule], it_Integer:1000]:=
 Module[{func, funcArgs, funcOpts},
@@ -92,13 +79,6 @@ testFunction[func[##, Sequence@@funcOpts]&, funcArgs, it]
 
 
 ClearAll[testFunctionRandomUndivided]
-
-testFunctionRandomUndivided::usage =
-"
-Breaks input to fit input of testFunctionRandom.
-Where <fArgs> contains PLCHDR on positions, that must
-be filled by <generator> output.
-";
 
 SetAttributes[testFunctionRandomUndivided, HoldAll]
 testFunctionRandomUndivided[function_[fArgs___, fOpts___Rule],
@@ -127,6 +107,9 @@ Flatten[
 Table[{{f, r}, testFunctionRandom[function, f, randomGenerator, r, it, identicalOut]},
 {f, functionListOfInputs}, {r, generatorListOfInputs}],
 1]
+
+
+End[];
 
 
 EndPackage[]

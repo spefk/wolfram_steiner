@@ -3,14 +3,16 @@
 BeginPackage["Steiner`Generator`"];
 
 
-ClearAll[generateSteinerProblemInstance]
 generateSteinerProblemInstance::usage=
-"
-Input: n \[Dash] vertex number; t \[Dash] terminal number.
-Options: BernoulliProbablility \[Dash] probability for BernoulliGraphDistribution,
-WeightBounds \[Dash] {x, y} \[Dash] random weight upper and lower bounds.
-Output: {<Connected weighted graph>, edgeWeights_Association, terminals_List}
-";
+"Input: n \[Dash] vertex number; t \[Dash] terminal number.
+Options: BernoulliProbablility \[Dash] probability for BernoulliGraphDistribution, WeightBounds \[Dash] {x, y} \[Dash] random weight upper and lower bounds.
+Output: {<Connected weighted graph>, edgeWeights_Association, terminals_List}";
+
+
+Begin["`Private`"];
+
+
+ClearAll[generateSteinerProblemInstance]
 
 Options[generateSteinerProblemInstance] = {BernoulliProbability -> 0.15, WeightBounds ->{1, 100}};
 
@@ -29,6 +31,9 @@ weightAssociation = Association[#->RandomInteger[OptionValue[WeightBounds]]&/@Ed
 weightAssociation,
 RandomSample[VertexList[graph], t]}
 ]
+
+
+End[];
 
 
 EndPackage[]
