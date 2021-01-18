@@ -15,7 +15,8 @@ leftistHeapHeapify::usage           =    "To create a leftist heap from list of 
 leftistHeapPush::usage              =    "To push a pair {<elem>, <priority>} to an existing leftist heap.";
 leftistExtractMin::usage            =    "To extract <elem> with !lowest! priority from an existing leftist heap.";
 leftistHeapQ::usage                 =    "Checks (lightly) if argument is leftist heap.";
-leftistHeapPeek::usage              =    "Get key of minimum element, but not extract it";
+leftistHeapPeek::usage              =    "Get key of minimum element, but not extract it.";
+leftistHeapExtractAll::usage        =    "Get all elements heap contains in arbitrary order.";
 
 
 Begin["`Private`"];
@@ -102,7 +103,7 @@ leftistExtractMin::usage = "Returns minimum <elem> in <heap>.";
 SetAttributes[leftistExtractMin, HoldFirst]
 leftistExtractMin[heap_] :=
 If[MatchQ[heap, {}],
-None, 
+Null, 
 (Unevaluated[heap]= leftistHeapMeld[heap[[4]], heap[[5]]];#)&[heap[[1]]]
 ]
 
@@ -111,6 +112,13 @@ None,
 ClearAll[leftistHeapPeek]
 
 leftistHeapPeek[{xe_, xp_, xd_, xl_, xr_ }] := xe;
+
+
+ClearAll[leftistHeapExtractAll, leftistHeapExtractAllRec]
+
+leftistHeapExtractAll[{xe_, xp_, xd_, xl_, xr_ }] := Reap[leftistHeapExtractAllRec[{xe, xp, xd, xl, xr}]][[2, 1]]
+leftistHeapExtractAllRec[{xe_, xp_, xd_, xl_, xr_ }] := (Sow[xe];leftistHeapExtractAllRec[xl];leftistHeapExtractAllRec[xr];)
+leftistHeapExtractAllRec[{}] := Null 
 
 
 End[];
