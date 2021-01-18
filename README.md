@@ -1,5 +1,5 @@
 # wolfram_steiner
-##Wolfram Mathematica steiner tree problem solving package.
+## Wolfram Mathematica steiner tree problem solving package.
 
 Exact methods:
 1. Dreyfus-Wagner algorithm, straight dynamic realisation O(n 3^t + n^2 2^t + poly())
