@@ -39,9 +39,10 @@ ClearAll[testFunction]
 testFunction[
 function : _Symbol|_Function,
 arguments_List,
-it_:10]:=
+it_:10,
+aggrFunc_:Min]:=
 Composition[
-{Mean@First@#, Min@Last@#}&,
+{Mean@First@#, aggrFunc@Last@#}&,
 Transpose@#&,
 Table[AbsoluteTiming@function[Sequence@@arguments], it]&
 ][]
@@ -94,8 +95,8 @@ testFunctionRandom[func[##, Sequence@@funcOpts]&, funcArgs, gen[##, Sequence@@ge
 
 ClearAll[tester]
 
-tester[function : _Symbol|_Function, functionListOfInputs : {__List}, it_:10]:=
-Table[{f, testFunction[function, f, it]}, {f, functionListOfInputs}]
+tester[function : _Symbol|_Function, functionListOfInputs : {__List}, it_:10, aggrFunc_:Min]:=
+Table[{f, testFunction[function, f, it, aggrFunc]}, {f, functionListOfInputs}]
 
 
 
