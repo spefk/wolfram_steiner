@@ -25,7 +25,7 @@ edgeWeight[graph_Graph, edge_]:=PropertyValue[{graph, edge}, EdgeWeight]
 
 (* ::Input::Initialization::Plain:: *)
 ClearAll[edgeWeightSum]
-
+edgeWeightSum[graph_Graph, edgeList_]:=Total[edgeWeight[graph, #]&/@edgeList]
 edgeWeightSum[edges_List, weights_Association]:=Total[Lookup[weights, #]&/@edges]
 
 
