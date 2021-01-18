@@ -5,7 +5,7 @@ BeginPackage["Steiner`SteinLib`"];
 
 getInstancesList::usage           = "Gives list of paths to all .stp files in <path>.";
 importSteinLibInstance::usage     = "Reads .stp file at <libPath> and returns {Graph[], List[ edge->weight], List[ terminals ]}.";
-importSteinLibInstanceList::usage = "TEST Returns an imported steiner problem instance for each path."
+importSteinLibInstanceList::usage = "TEST Returns an imported steiner problem instance for each path.";
 
 
 Begin["`Private`"];
@@ -17,7 +17,7 @@ stlibFormat = "*.stp";
 
 
 ClearAll[getInstancesList]
-getInstancesList[path_] := FileNames[stlibFormat, Directory[]~~path]
+getInstancesList[path_] := FileNames[stlibFormat, path]
 
 
 (* ::Code::Initialization::Plain:: *)
@@ -33,7 +33,7 @@ StringSplit/@#&,
 Cases[#, x_/;StringMatchQ[ToString@x, "E *"|"T *"]]&,
 Flatten@#&,
 Import[#, "Data"]&
-][Directory[]~~libPath]
+][libPath]
 
 
 (* ::Input::Initialization::Plain:: *)

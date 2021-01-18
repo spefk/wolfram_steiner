@@ -6,10 +6,11 @@ BeginPackage["Steiner`Algorithms`Voronoi`"];
 Needs["Steiner`Algorithms`GraphUtilities`", NotebookDirectory[]~~"\\packages\\steiner_algorithms_graph_utilities.wl"]
 
 
-dijkstraVoronoi::usage = "Finds voronoi diagramm of graph.
-Returns: \[LeftAssociation]\"distance\" \[Rule] FixedArray[<distances>], \"ancestors\" \[Rule] FixedArray[<ancestors>], \"voronoi\" \[Rule] FixedArray[<voronoi centers>]\[RightAssociation]";
+dijkstraVoronoi::usage = "Finds voronoi diagramm of graph. Returns: \[LeftAssociation]\"distance\" \[Rule] FixedArray[<distances>], \"ancestors\" \[Rule] FixedArray[<ancestors>], \"voronoi\" \[Rule] FixedArray[<voronoi centers>]\[RightAssociation]";
 dijkstraFindPath::usage = "Finds path of edges from <vert>'s voronoi terminal to <vert> according to <anc>.";
-repairVoronoi::usage = "";
+voronoiBoundaryPath::usage = "Get path vor boundary edge.";
+voronoiBoundaryPathCost::usage = "Get shortest path for boundary edge cost.";
+repairVoronoi::usage = "Recalculates voronoi for the subset of current terminals (centers).";
 
 
 Begin["`Private`"];
@@ -74,6 +75,23 @@ dijkstraFindPathRec[-1, anc_] := Nothing
 ClearAll[repairVoronoi]
 
 repairVoronoi[] := 1
+
+
+ClearAll[voronoiBoundaryPath, voronoiBoundaryPathRec]
+
+voronoiBoundaryPath[edge_, par_, centers_]/;centers["Part", First[edge]]!=centers["Part", Last[edge]]:=
+Join[{voronoiBoundaryPathRec[First[edge], par]}, {edge}, {voronoiBoundaryPathRec[Last[edge], par]}]
+
+voronoiBoundaryPathRec[vert_, par_] := Sequence[UndirectedEdge@@Sort[{vert, par["Part", vert]}], voronoiBoundaryPathRec[par["Part", vert], par]]
+voronoiBoundaryPathRec[vert_, par_]/;par["Part", vert]==-1 := Nothing
+voronoiBoundaryPathRec[-1, par_] := Nothing
+
+
+ClearAll[voronoiBoundaryPathCost]
+
+voronoiBoundaryPathCost[graph_, edge_, centers_, dist_]/;centers["Part", First[edge]]!=centers["Part", Last[edge]]:=
+dist["Part", First[edge]]+dist["Part", Last[edge]]+edgeWeight[graph, edge]
+
 
 
 End[];

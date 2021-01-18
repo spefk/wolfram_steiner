@@ -7,8 +7,9 @@ testFunction::usage                = "Evaluates <function> on <arguments> <it> t
 testFunctionRandom::usage          = "Evaluates <function> on <arguments> <it> times, where element <PLHDR> in List <arguments> marks argument, that must be filled (positionaly) by output of <randomGenerator>, that is evaluated on <generatorArguments> on each test iteration. Returns mean AbsoluteTime of computations.";
 testFunctionUndivided::usage       = "Breaks input to fit input of testFunction.";
 testFunctionRandomUndivided::usage = "Breaks input to fit input of testFunctionRandom. Where <fArgs> contains PLCHDR on positions, that must be filled by <generator> output.";
-tester::usage                      = ""
-testerRandom::usage                = ""
+tester::usage                      = "";
+testerRandom::usage                = "";
+PLCHDR::usage                      = "Placeholder for marking changable arguments.";
 
 
 Begin["`Private`"];
@@ -38,7 +39,7 @@ ClearAll[testFunction]
 testFunction[
 function : _Symbol|_Function,
 arguments_List,
-it_:1000]:=
+it_:10]:=
 Composition[
 {Mean@First@#, Min@Last@#}&,
 Transpose@#&,
@@ -93,7 +94,7 @@ testFunctionRandom[func[##, Sequence@@funcOpts]&, funcArgs, gen[##, Sequence@@ge
 
 ClearAll[tester]
 
-tester[function : _Symbol|_Function, functionListOfInputs : {__List}, it_:1000]:=
+tester[function : _Symbol|_Function, functionListOfInputs : {__List}, it_:10]:=
 Table[{f, testFunction[function, f, it]}, {f, functionListOfInputs}]
 
 
