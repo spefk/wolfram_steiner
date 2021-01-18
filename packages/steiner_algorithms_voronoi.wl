@@ -21,12 +21,12 @@ ClearAll[dijkstraVoronoi]
 dijkstraVoronoi[graph_Graph, terminals_]:=
 Module[
 {
-spValue       =   CreateDataStructure["FixedArray", Infinity, VertexCount[graph]],
-ancestors     =   CreateDataStructure["FixedArray", Infinity, VertexCount[graph]],
-voronoiCenter =   CreateDataStructure["FixedArray", Infinity, VertexCount[graph]],
-used          =   CreateDataStructure["BitVector", VertexCount[graph] + 1],
-heap          =   CreateDataStructure["PriorityQueue"],
-orderOfVisit  =   CreateDataStructure["Stack"],
+spValue            =   CreateDataStructure["FixedArray", Infinity, VertexCount[graph]],
+ancestors          =   CreateDataStructure["FixedArray", Infinity, VertexCount[graph]],
+voronoiCenter      =   CreateDataStructure["FixedArray", Infinity, VertexCount[graph]],
+used               =   CreateDataStructure["BitVector", VertexCount[graph] + 1],
+heap               =   CreateDataStructure["PriorityQueue"],
+orderOfVisit       =   CreateDataStructure["Stack"],
 curVert, curWeight
 },
 

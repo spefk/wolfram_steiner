@@ -5,15 +5,15 @@ BeginPackage["Steiner`Algorithms`LocalSearch`"];
 
 Needs["Steiner`Algorithms`GraphUtilities`", NotebookDirectory[]~~"\\packages\\steiner_algorithms_graph_utilities.wl"]
 Needs["Steiner`Algorithms`Voronoi`", NotebookDirectory[]~~"\\packages\\steiner_algorithms_graph_utilities.wl"]
-Needs["LeftistHeap`", NotebookDirectory[]~~"packages\\data_structures\\leftist_heap.wl"]
+Needs["LeftistHeap`", NotebookDirectory[]~~"\\packages\\data_structures\\leftist_heap.wl"]
 
 
-steinerVertexInsertion::usage = "Algorithm tries to add (insert) arbitrary vertex to tree and recalculate mst. It applies all possible insertion.";
-steinerVertexInsertionFixedPoint::usage = "Uses steinerVertexInsertion untill possible.";
-steinerVertexElimination::usage = "Algorithm tries to eliminate arbitrary steiner(!)-vertex from tree and recalculate mst. It applies all possible eliminations.";
+steinerVertexInsertion::usage             = "Algorithm tries to add (insert) arbitrary vertex to tree and recalculate mst. It applies all possible insertion.";
+steinerVertexInsertionFixedPoint::usage   = "Uses steinerVertexInsertion untill possible.";
+steinerVertexElimination::usage           = "Algorithm tries to eliminate arbitrary steiner(!)-vertex from tree and recalculate mst. It applies all possible eliminations.";
 steinerVertexEliminationFixedPoint::usage = "Uses steinerVertexElimination untill possible.";
-steinerVIVE::usage = "";
-steinerVIVEFixedPoint::usage = "";
+steinerVIVE::usage                        = "";
+steinerVIVEFixedPoint::usage              = "";
 
 
 Begin["`Private`"];
@@ -64,7 +64,9 @@ ClearAll[steinerVertexElimination, steinerVertexEliminationFixedPoint]
 
 steinerVertexElimination[graph_, tree_, terminals_] :=
 Block[{tryEliminateVertex},
-Module[{treeVertices = VertexList @ tree, solution = tree, solWeight},
+Module[{treeVertices = VertexList@tree, solution=tree, solWeight},
+solWeight = edgeWeightSum[graph, EdgeList[tree]];
+
 tryEliminateVertex[v_] :=
 Composition[
 If[ConnectedGraphQ[#[[1]]] \[And] solWeight > #[[2]],
@@ -74,8 +76,6 @@ treeVertices = VertexList @ solution;]&,
 {#, edgeWeightSum[graph, EdgeList[#]]}&,
 FindSpanningTree[#]&,
 Subgraph[graph, Complement[treeVertices, {#}]]&][v];
-
-solWeight = edgeWeightSum[graph, EdgeList[tree]];
 
 Scan[tryEliminateVertex[#]&,
 Complement[treeVertices, terminals]];
