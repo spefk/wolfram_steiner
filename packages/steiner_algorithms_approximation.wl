@@ -7,7 +7,7 @@ Needs["Steiner`Algorithms`GraphUtilities`", NotebookDirectory[]~~"\\packages\\st
 Needs["Steiner`Algorithms`Voronoi`", NotebookDirectory[]~~"\\packages\\steiner_algorithms_voronoi.wl"]
 
 
-runKouMarkowskyBerman::usage = "
+runKouMarkowskyBerman::usage := "
 Asymptotic time of first step is O(|T||E| log|V|),
 not recommended to use in solving instances with big |T|,
 because it builds (full graph) metric closure on T.
@@ -16,7 +16,7 @@ Input: graph \[Dash] weighted Graph instance, terminals \[Dash] list of terminal
 Output: edges of 2-approximation of steiner tree.";
 
 
-runMehlhorn::usage = "
+runMehlhorn::usage := "
 Asymptotic time of first step is O(|E| log|V|) (binary heap dijkstra)(could be better with Fibonacci heap), it is not building a full grah on T,
 so could be used in solving instances with big |T|.
 

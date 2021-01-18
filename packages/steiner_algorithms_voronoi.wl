@@ -6,11 +6,11 @@ BeginPackage["Steiner`Algorithms`Voronoi`"];
 Needs["Steiner`Algorithms`GraphUtilities`", NotebookDirectory[]~~"\\packages\\steiner_algorithms_graph_utilities.wl"]
 
 
-dijkstraVoronoi::usage = "Finds voronoi diagramm of graph. Returns: \[LeftAssociation]\"distance\" \[Rule] FixedArray[<distances>], \"ancestors\" \[Rule] FixedArray[<ancestors>], \"voronoi\" \[Rule] FixedArray[<voronoi centers>]\[RightAssociation]";
-dijkstraFindPath::usage = "Finds path of edges from <vert>'s voronoi terminal to <vert> according to <anc>.";
-voronoiBoundaryPath::usage = "Get path vor boundary edge.";
+dijkstraVoronoi::usage         = "Finds voronoi diagramm of graph. Returns: \[LeftAssociation]\"distance\" \[Rule] FixedArray[<distances>], \"ancestors\" \[Rule] FixedArray[<ancestors>], \"voronoi\" \[Rule] FixedArray[<voronoi centers>]\[RightAssociation]";
+dijkstraFindPath::usage        = "Finds path of edges from <vert>'s voronoi terminal to <vert> according to <anc>.";
+voronoiBoundaryPath::usage     = "Get path vor boundary edge.";
 voronoiBoundaryPathCost::usage = "Get shortest path for boundary edge cost.";
-repairVoronoi::usage = "Recalculates voronoi for the subset of current terminals (centers) using data from original voronoi and returns edge denoting a minmal path between set u belongs and other.";
+repairVoronoi::usage           = "Used in Key-path Exchange. Recalculates voronoi for the subset of current terminals (centers) using data from original voronoi and returns edge denoting a minmal path between set u belongs and other.";
 
 
 Begin["`Private`"];
@@ -63,10 +63,9 @@ AdjacencyList[graph, curVert]]
 (* ::Input::Initialization::Plain:: *)
 ClearAll[dijkstraFindPath, dijkstraFindPathRec]
 
-dijkstraFindPath[vert_, anc_] := UndirectedEdge@@@Partition[{dijkstraFindPathRec[vert, anc]}, 2, 1]
-
-dijkstraFindPathRec[vert_, anc_] := Sequence[dijkstraFindPathRec[anc["Part", vert], anc], vert]
-dijkstraFindPathRec[-1, anc_] := Nothing
+dijkstraFindPath[vert_, anc_]        := UndirectedEdge@@@Partition[{dijkstraFindPathRec[vert, anc]}, 2, 1]
+dijkstraFindPathRec[vert_, anc_]          := Sequence[dijkstraFindPathRec[anc["Part", vert], anc], vert]
+dijkstraFindPathRec[-1, anc_]        := Nothing
 
 
 (* ::Input::Initialization::Plain:: *)
@@ -92,15 +91,12 @@ VertexList@graph];
 
 
 processEdge[u_, v_] := 
-(Sow[{"proc", u, v }, "swap"];
-If[!used["BitTest", u] \[And] dist["Part", u] > dist["Part", v] + edgeWeight[graph, v\[UndirectedEdge]u],
+(If[!used["BitTest", u] \[And] dist["Part", u] > dist["Part", v] + edgeWeight[graph, v\[UndirectedEdge]u],
 (heap["Push", {-(dist["Part", v] + edgeWeight[graph, v\[UndirectedEdge]u]), u}];
 anc["SetPart", u, v];
 cent["SetPart", u, cent["Part", v]];
 dist["SetPart", u, dist["Part", v]+ edgeWeight[graph, v\[UndirectedEdge]u]];)]);
 processEdge[u_, v_ ]/;used["BitTest", u]\[And]!used["BitTest", v] := (Sow[{"swapped", u, v }, "swap"];processEdge[v, u]);
-
-Sow[Cases[boundaryEdges, x_/;Xor[used["BitTest", First[x]], used["BitTest", Last[x]]]], "vorRep"];
 
 Scan[
 processEdge[Sequence@@#]&,
@@ -112,23 +108,19 @@ While[!heap["EmptyQ"],
 curWeight *= -1;
 
 If[used["BitTest", curVert], Continue[]];
-Sow[curVert, "vVerts"];
 used["BitSet", curVert];
 
-Scan[(processEdge[#[[1]], #[[2]]];
-Sow[#, "vEdge"];
-If[used["BitTest", #[[1]]]\[And]used["BitTest", #[[2]]], 
-If[Xor[disj["CommonSubsetQ", uDown, cent["Part", #[[1]]]], disj["CommonSubsetQ", uDown, cent["Part", #[[2]]]]],
-If[bestPathWeight> edgeWeight[graph, #] + dist["Part", #[[1]]]+dist["Part", #[[1]]],
+Scan[
+(processEdge[#[[1]], #[[2]]];
+If[(used["BitTest", #[[1]]]\[And]used["BitTest", #[[2]]])\[And]
+Xor[disj["CommonSubsetQ", uDown, cent["Part", #[[1]]]], disj["CommonSubsetQ", uDown, cent["Part", #[[2]]]]]\[And]
+(bestPathWeight> edgeWeight[graph, #] + dist["Part", #[[1]]]+dist["Part", #[[1]]]),
 (bestPathWeight = edgeWeight[graph, #] + dist["Part", #[[1]]]+dist["Part", #[[1]]];
 bestPath = Join[{#}, dijkstraFindPath[#[[1]], anc], dijkstraFindPath[#[[2]], anc]])
-]]];)&,
+];)&,
 IncidenceList[graph, curVert]];
 
 ];
-Sow[{}, "vEdge"];
-Sow[{}, "vVerts"];
-Sow[{lostCenters, Complement[VertexList@graph, used["BitList"]]}, "vorRepParams"];
 
 bestPath
 ]

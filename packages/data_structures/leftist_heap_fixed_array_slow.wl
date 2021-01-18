@@ -3,6 +3,9 @@
 (* Realisation uses FixedArray WM 12.1 DataStructure to carry node of heap. *)
 
 
+(* It is slower than LinkedList's realisation, yet it is an example of exploiting WM internal possibilities to obtain Pointer alternative. *)
+
+
 (* ::Subsubsection:: *)
 (*Package*)
 
