@@ -17,17 +17,18 @@ Begin["`Private`"];
 (* SPH *)
 
 
-ClearAll[steinerShortestPathHeuristic]
 steinerShortestPathHeuristic[graph_, terminals_, startTerminal_,
 						     distPassed_:Null, ancPassed_:Null]:=
 	Module[
 		{n = VertexCount@graph, t = Length@terminals,
 		dist, anc, tree, inTree, candidates, curEdge,
-		curVert, curPath, curAnc, dij},
+		curVert, curPath, curAnc, dij, pushed},
 
 		If[MatchQ[distPassed, Null]\[Or]MatchQ[ancPassed, Null],
 			dist            = CreateDataStructure["FixedArray"   ,     n];
-			anc             = CreateDataStructure["FixedArray"   ,     n];
+			anc             = CreateDataStructure["FixedArray"   ,     n];,
+			dist            = distPassed;
+			anc             = ancPassed;
 		];
 
 		pushed              = CreateDataStructure["BitVector"    , 1 + n];
@@ -87,7 +88,6 @@ steinerShortestPathHeuristic[graph_, terminals_, startTerminal_,
 (* RSPH *)
 
 
-ClearAll[steinerRepeatedShortestPathHeuristic]
 steinerRepeatedShortestPathHeuristic[graph_, terminals_, it_:100]:=
 	Module[{dist, anc},
 		dist = CreateDataStructure["FixedArray", VertexCount@graph];

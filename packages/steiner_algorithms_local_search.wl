@@ -137,16 +137,16 @@ steinerKeyPathExchange[graph_, tree_, terminals_]:=
 	currentInternalKeyPath = CreateDataStructure["Stack"];
 		With[
 			{
-				treeVertexNumber = VertexCount@tree,
-				graphVertexNumber=VertexCount@graph,
-				treeEdges = EdgeList@tree,
-				graphEdges = EdgeList@graph,
-				graphVertices = VertexList@graph,
-				treeVertices = VertexList@tree
+				treeVertexNumber  = VertexCount@tree,
+				graphVertexNumber = VertexCount@graph,
+				treeEdges         = EdgeList@tree,
+				graphEdges        = EdgeList@graph,
+				graphVertices     = VertexList@graph,
+				treeVertices      = VertexList@tree
 			},
 			Module[
 				{voronoi, dist, anc, cent, heapArray, solution,
-				root, depth, parent, children,graphTreeEdges, disj,time,
+				root, depth, parent, children,graphTreeEdges, disj, time,
 				baseBoundaryEdges, eliminatedPath, boundaryEdges, toHeapify},
 
 				solution       = treeEdges;
@@ -220,10 +220,10 @@ steinerKeyPathExchange[graph_, tree_, terminals_]:=
 
 						curBoundaryEdges = Normal[boundaryEdges["Part", #]]&/@currentInternalKeyPathNormal;
 						curBoundaryEdges = Select[Flatten[Join@@curBoundaryEdges],
-						Xor[
-							MemberQ[currentInternalKeyPathNormal, cent["Part", First[#]]],
-							MemberQ[currentInternalKeyPathNormal, cent["Part", Last[#]]]]&];
-						Sow[curBoundaryEdges, "boundEdges"];
+							Xor[
+								MemberQ[currentInternalKeyPathNormal, cent["Part", First[#]]],
+								MemberQ[currentInternalKeyPathNormal, cent["Part", Last[#]]]]&];
+							Sow[curBoundaryEdges, "boundEdges"];
 
 						paths =
 						DeleteCases[
@@ -239,19 +239,17 @@ steinerKeyPathExchange[graph_, tree_, terminals_]:=
 								eliminatedPath = {paths, path};
 							];
 						];
-
 						tabuVertices = Join[VertexList@bottomTree, Normal@currentInternalKeyPath];
-
 					];
 
 				dfs[v_]:=
 					Module[
 						{successors, prevCrus, path},
 
-						successors = Normal@children["Part", v]
+						successors = Normal[children["Part", v]];
 
 						prevCrus = -1;
-						path = {};
+						path = Null;
 
 						Scan[Function[child,
 							({prevCrus, path} = dfs[child];
@@ -272,14 +270,13 @@ steinerKeyPathExchange[graph_, tree_, terminals_]:=
 								(path = CreateDataStructure["Stack"];
 								path["Push", UndirectedEdge[v, parent["Part", v]]];
 								{v, path}),
-							(Length@successors == 1 \[And] !MatchQ[prevCrus, -1]),
+							Length@successors == 1 \[And] !MatchQ[prevCrus, -1],
 								(currentInternalKeyPath["Push", v];
 								path["Push", UndirectedEdge[v, parent["Part", v]]];
 								{prevCrus, path}),
 							True,
 								{-1, {}}
 						]
-
 					];
 
 				dfs[root];
