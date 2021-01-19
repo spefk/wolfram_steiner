@@ -11,29 +11,30 @@ importSteinLibInstanceList::usage = "TEST Returns an imported steiner problem in
 Begin["`Private`"];
 
 
-(* ::Input::Initialization::Plain:: *)
 stlibFormat = "*.stp";
 
 
 getInstancesList[path_] := FileNames[stlibFormat, path]
 
 
-(* ::Code::Initialization::Plain:: *)
-importSteinLibInstance[libPath_]:=
-Composition[
-{Graph[Keys@First[#], EdgeWeight->Values@First[#]], Association@First[#], Last[#]}&,
-{(Min[#1, #2]\[UndirectedEdge]Max[#1, #2]->#3)&[##]&@@@#["E"], Flatten@#["T"]}&,
-MapAt[ToExpression, #, {All, All, All}]&,
-GroupBy[#, First->Rest]&,
-StringSplit/@#&,
-Cases[#, x_/;StringMatchQ[ToString@x, "E *"|"T *"]]&,
-Flatten@#&,
-Import[#, "Data"]&
-][libPath]
+importSteinLibInstance[libPath_] :=
+	Composition[
+		{
+		Graph[Keys@First[#],
+		EdgeWeight->Values@First[#]],
+		Association@First[#], Last[#]
+		}&,
+		{(Min[#1, #2]\[UndirectedEdge]Max[#1, #2]->#3)&[##]&@@@#["E"], Flatten@#["T"]}&,
+		MapAt[ToExpression, #, {All, All, All}]&,
+		GroupBy[#, First->Rest]&,
+		StringSplit/@#&,
+		Cases[#, x_/;StringMatchQ[ToString@x, "E *"|"T *"]]&,
+		Flatten@#&,
+		Import[#, "Data"]&
+	][libPath]
 
 
-(* ::Input::Initialization::Plain:: *)
-importSteinLibInstanceList[pathList:{__String}]:=importSteinLibInstance[#]&/@pathList
+importSteinLibInstanceList[pathList:{__String}] := importSteinLibInstance[#]&/@pathList
 
 
 End[];

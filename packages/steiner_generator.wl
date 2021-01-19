@@ -18,70 +18,79 @@ Begin["`Private`"];
 Options[generateSteinerProblemInstanceRG] = {WeightBounds ->{1, 100}};
 
 generateSteinerProblemInstanceRG[n_:10, m_:15, t_:3, opts:OptionsPattern[]]:=
-Module[{graph, weightAssociation},
+	Module[{graph, weightAssociation},
 
-While[
-graph =  RandomGraph[{n, m}];
-!ConnectedGraphQ[graph]
-];
+		While[
+			graph =  RandomGraph[{n, m}];
+			!ConnectedGraphQ[graph]
+		];
 
-weightAssociation = Association[#->RandomInteger[OptionValue[WeightBounds]]&/@EdgeList[graph]];
+		weightAssociation = Association[# -> RandomInteger[OptionValue[WeightBounds]]&/@EdgeList[graph]];
 
-{Graph[graph, EdgeWeight->Values@weightAssociation],
-weightAssociation,
-RandomSample[VertexList[graph], t]}
-]
+		{
+		Graph[graph, EdgeWeight->Values@weightAssociation],
+		weightAssociation,
+		RandomSample[VertexList[graph], t]
+		}
+	]
 
 
 Options[generateSteinerProblemInstance] = {BernoulliProbability -> 0.15, WeightBounds ->{1, 100}};
 
 generateSteinerProblemInstance[n_:10, t_:3, opts:OptionsPattern[]]:=
-Module[{graph, weightAssociation},
+	Module[{graph, weightAssociation},
 
-While[
-graph =  RandomGraph[BernoulliGraphDistribution[n, OptionValue[BernoulliProbability]]];
-!ConnectedGraphQ[graph]
-];
+		While[
+			graph =  RandomGraph[BernoulliGraphDistribution[n, OptionValue[BernoulliProbability]]];
+			!ConnectedGraphQ[graph]
+		];
 
-weightAssociation = Association[#->RandomInteger[OptionValue[WeightBounds]]&/@EdgeList[graph]];
+		weightAssociation = Association[#->RandomInteger[OptionValue[WeightBounds]]&/@EdgeList[graph]];
 
-{Graph[graph, EdgeWeight->Values@weightAssociation],
-weightAssociation,
-RandomSample[VertexList[graph], t]}
-]
+		{
+		Graph[graph, EdgeWeight->Values@weightAssociation],
+		weightAssociation,
+		RandomSample[VertexList[graph], t]
+		}
+	]
 
 
 generate2DSteinerProblemInstance[n_:15, t_:3]:=
-Module[{out = {}},
+	Module[{out = {}},
 
-While[True, 
-out = generate2DSteinerProblemInstanceStep[n, t];
-If[ConnectedGraphQ[First@out], Break[]];
-];
-out]
+		While[True, 
+			out = generate2DSteinerProblemInstanceStep[n, t];
+			If[ConnectedGraphQ[First@out], Break[]];
+		];
+		out]
 
 generate2DSteinerProblemInstanceStep[n_:15, t_:3] := 
-Module[{vertsMap, edges, coords, weightAssociation},
-coords = RandomReal[{-100, 100}, {n, 2}];
-vertsMap = AssociationThread[Range@n, coords];
-edges = Subsets[Range@n, {2}];
-weightAssociation = Association@@((#->EuclideanDistance[vertsMap[#[[1]]], vertsMap[#[[2]]]])&/@edges);
-{Graph[Range@n, UndirectedEdge@@@edges, EdgeWeight->Values@weightAssociation, VertexCoordinates->coords],
-weightAssociation,
-RandomSample[Range@n, t]}
-]
+	Module[{vertsMap, edges, coords, weightAssociation},
+		coords   = RandomReal[{-100, 100}, {n, 2}];
+		vertsMap = AssociationThread[Range@n, coords];
+		edges    = Subsets[Range@n, {2}];
+		weightAssociation = Association@@((#->EuclideanDistance[vertsMap[#[[1]]], vertsMap[#[[2]]]])&/@edges);
+		{
+		Graph[Range@n, UndirectedEdge@@@edges, EdgeWeight->Values@weightAssociation, VertexCoordinates->coords],
+		weightAssociation,
+		RandomSample[Range@n, t]
+		}
+	]
 
 
 generateSteinerProblemInstanceGrid[r_, c_, t_]:=
-Module[{graph, weightAssociation},
+	Module[{graph, weightAssociation},
 
-graph =  GridGraph[{r, c}];
+		graph =  GridGraph[{r, c}];
 
-weightAssociation = Association[#->1&/@EdgeList[graph]];
+		weightAssociation = Association[#->1&/@EdgeList[graph]];
 
-{Graph[graph, EdgeWeight->Values@weightAssociation],
-RandomSample[VertexList[graph], t]}
-]
+		{
+		Graph[graph,
+		EdgeWeight->Values@weightAssociation],
+		RandomSample[VertexList[graph], t]
+		}
+	]
 
 
 End[];

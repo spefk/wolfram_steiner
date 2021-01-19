@@ -35,65 +35,74 @@ testFunction[
 function : _Symbol|_Function,
 arguments_List,
 it_:10,
-aggrFunc_:Min]:=
-Composition[
-{Mean@First@#, aggrFunc@Last@#}&,
-Transpose@#&,
-Table[AbsoluteTiming@function[Sequence@@arguments], it]&
-][]
+aggrFunc_:Min] :=
+	Composition[
+		{Mean@First@#, aggrFunc@Last@#}&,
+		Transpose@#&,
+		Table[AbsoluteTiming@function[Sequence@@arguments], it]&
+	][]
 
 
 
 testFunctionRandom[
 function        : _Symbol|_Function, arguments_List,
 randomGenerator : _Symbol|_Function, generatorArguments_List,
-it_:1000, identicalOut_:False]:=
-Block[{func, rndGen, result},
-rndGen[]            := randomGenerator[Apply[Sequence, generatorArguments]];
-func[rndValue_List] := function[Apply[Sequence, setMarked[arguments,rndValue]]];
-func[rndValue_]     := function[Apply[Sequence, setMarked[arguments,{rndValue}]]];
-result[x_, False]   := Mean@First[x];
-result[x_, True]    := If[Equal@@Last[x], Mean@First[x], Throw["BadResult"]];
+it_:1000, identicalOut_:False] :=
+	Block[{func, rndGen, result},
 
-Composition[
-result[#, identicalOut]&,
-Transpose@#&,
-Table[AbsoluteTiming@func[rndGen[]], it]&
-][]
-]
+		rndGen[]            := randomGenerator[Apply[Sequence, generatorArguments]];
+		func[rndValue_List] := function[Apply[Sequence, setMarked[arguments,rndValue]]];
+		func[rndValue_]     := function[Apply[Sequence, setMarked[arguments,{rndValue}]]];
+		result[x_, False]   := Mean@First[x];
+		result[x_, True]    := If[Equal@@Last[x], Mean@First[x], Throw["BadResult"]];
+
+		Composition[
+			result[#, identicalOut]&,
+			Transpose@#&,
+			Table[AbsoluteTiming@func[rndGen[]], it]&
+		][]
+	]
 
 
 SetAttributes[testFunctionUndivided, HoldAll]
 testFunctionUndivided[function_[fArgs___, fOpts___Rule], it_Integer:1000]:=
-Module[{func, funcArgs, funcOpts},
-{func, funcArgs, funcOpts} = dismemberFunction[function[fArgs, fOpts]];
-testFunction[func[##, Sequence@@funcOpts]&, funcArgs, it]
-]
+	Module[{func, funcArgs, funcOpts},
+		{func, funcArgs, funcOpts} = dismemberFunction[function[fArgs, fOpts]];
+		testFunction[func[##, Sequence@@funcOpts]&, funcArgs, it]
+	]
 
 
 SetAttributes[testFunctionRandomUndivided, HoldAll]
 testFunctionRandomUndivided[function_[fArgs___, fOpts___Rule],
                             generator_[gArgs___, gOpts___Rule],
                             it_Integer:1000, identicalOut_:False]:=
-Module[{func, funcArgs, funcOpts, gen, genArgs, genOpts},
-{func, funcArgs, funcOpts} = dismemberFunction[function[fArgs, fOpts]];
-{gen, genArgs, genOpts}    = dismemberFunction[generator[gArgs, gOpts]];
-testFunctionRandom[func[##, Sequence@@funcOpts]&, funcArgs, gen[##, Sequence@@genOpts]&, genArgs, it, identicalOut]
-]
+	Module[{func, funcArgs, funcOpts, gen, genArgs, genOpts},
+		{func, funcArgs, funcOpts} = dismemberFunction[function[fArgs, fOpts]];
+		{gen, genArgs, genOpts}    = dismemberFunction[generator[gArgs, gOpts]];
+		testFunctionRandom[
+			func[##, Sequence@@funcOpts]&,
+			funcArgs,
+			gen[##, Sequence@@genOpts]&,
+			genArgs,
+			it,
+			identicalOut
+		]
+	]
 
 
 tester[function : _Symbol|_Function, functionListOfInputs : {__List}, it_:10, aggrFunc_:Min]:=
-Table[{f, testFunction[function, f, it, aggrFunc]}, {f, functionListOfInputs}]
+	Table[{f, testFunction[function, f, it, aggrFunc]}, {f, functionListOfInputs}]
 
 
 
-testerRandom[function        : _Symbol|_Function,        functionListOfInputs : {__List},
+testerRandom[function        : _Symbol|_Function,        functionListOfInputs  : {__List},
 	         randomGenerator : _Symbol|_Function,        generatorListOfInputs : {__List},
-	         it_:1000, identicalOut_:False]:=
-Flatten[
-Table[{{f, r}, testFunctionRandom[function, f, randomGenerator, r, it, identicalOut]},
-{f, functionListOfInputs}, {r, generatorListOfInputs}],
-1]
+	         it_             : 1000,                     identicalOut_         : False]:=
+	Flatten[
+		Table[{{f, r}, testFunctionRandom[function, f, randomGenerator, r, it, identicalOut]},
+		{f, functionListOfInputs}, {r, generatorListOfInputs}],
+		1
+		]
 
 
 End[];
