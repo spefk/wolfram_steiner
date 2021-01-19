@@ -84,7 +84,7 @@ ClearAll[gridResult]
 
 Options[gridResult] = Join[Options[Graph], {VertexStyleFunc -> {}, TerminalSize->0.5, TerminalShape->"Square"}];
 
-gridResult[graph_Graph,  terminals_, tree_, treeWeight_, opts:OptionsPattern[]]:=
+gridResult[graph_Graph, terminals_, tree_, treeWeight_, opts:OptionsPattern[]]:=
 Grid[{{"Graph", "Tree" , "Tree weight"},
 {drawGraphSubgraph[graph, tree, terminals, opts],
 drawGraph[Graph[tree], terminals, ImageSize->100],

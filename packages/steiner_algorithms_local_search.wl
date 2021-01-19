@@ -163,7 +163,7 @@ boundaryEdges = CreateDataStructure["FixedArray", graphVertexNumber];
 Scan[boundaryEdges["SetPart", #, CreateDataStructure["Stack"]]&, treeVertices];
 
 (* Push is costly for current implementation of leftist heap. *)
-(* It is better now (and in general) to firstly create arrays of elements, and then heapify them. *)
+(* It is better now (and in general) to firstly create arrays of elements, and then heapify them (because push just melds old heap with new heap of size 1), if it is possible. *)
 toHeapify = CreateDataStructure["FixedArray", graphVertexNumber];
 Scan[toHeapify["SetPart", #, CreateDataStructure["Stack"]]&, treeVertices];
 
@@ -216,9 +216,10 @@ MemberQ[deletedZones, cent["Part", First[#]]],
 MemberQ[deletedZones, cent["Part", Last[#]]]]&]];*)
 
 curBoundaryEdges = Normal[boundaryEdges["Part", #]]&/@currentInternalKeyPathNormal;
-curBoundaryEdges = Select[Flatten[Join@@curBoundaryEdges], Xor[
-MemberQ[currentInternalKeyPathNormal, cent["Part", First[#]]],
-MemberQ[currentInternalKeyPathNormal, cent["Part", Last[#]]]]&];
+curBoundaryEdges = Select[Flatten[Join@@curBoundaryEdges],
+Xor[
+	MemberQ[currentInternalKeyPathNormal, cent["Part", First[#]]],
+	MemberQ[currentInternalKeyPathNormal, cent["Part", Last[#]]]]&];
 Sow[curBoundaryEdges, "boundEdges"];
 
 paths = DeleteCases[
@@ -240,8 +241,10 @@ tabuVertices = Join[VertexList@bottomTree, Normal@currentInternalKeyPath];
 
 dfs[v_]:=
 Module[{successors = Normal@children["Part", v], prevCrus, path},
+
 prevCrus = -1;
 path = {};
+
 Scan[Function[child,
 ({prevCrus, path} = dfs[child];
 Switch[{prevCrus, crucialQ[v, treeEdges, terminals]},
@@ -261,6 +264,7 @@ crucialQ[v, treeEdges, terminals], {v, {UndirectedEdge@@Sort[{v, parent["Part", 
 (Length@successors == 1 \[And] !MatchQ[prevCrus, -1]), (currentInternalKeyPath["Push", v];{prevCrus, Append[path, UndirectedEdge@@Sort[{v, parent["Part", v]}]]}),
 True, {-1, {}}
 ]
+
 ];
 
 dfs[root];
