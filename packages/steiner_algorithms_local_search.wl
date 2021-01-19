@@ -145,7 +145,7 @@ With[{treeVertexNumber = VertexCount@tree, graphVertexNumber=VertexCount@graph,
 treeEdges = EdgeList@tree, graphEdges = EdgeList@graph, graphVertices = VertexList@graph, treeVertices = VertexList@tree},
 Module[{voronoi, dist, anc, cent, heapArray, solution,
 root, depth, parent, children,graphTreeEdges, disj,time,
-baseBoundaryEdges, eliminatedPath, boundaryEdges},
+baseBoundaryEdges, eliminatedPath, boundaryEdges, toHeapify},
 
 solution = treeEdges;
 graphTreeEdges = EdgeList@Subgraph[graph, treeVertices];
@@ -162,11 +162,24 @@ baseBoundaryEdges = Select[graphEdges, cent["Part", First[#]] != cent["Part", La
 boundaryEdges = CreateDataStructure["FixedArray", graphVertexNumber];
 Scan[boundaryEdges["SetPart", #, CreateDataStructure["Stack"]]&, treeVertices];
 
+(* Push is costly for current implementation of leftist heap. *)
+(* It is better now (and in general) to firstly create arrays of elements, and then heapify them. *)
+toHeapify = CreateDataStructure["FixedArray", graphVertexNumber];
+Scan[toHeapify["SetPart", #, CreateDataStructure["Stack"]]&, treeVertices];
+
+Scan[
+(toHeapify["Part", cent["Part", First[#]]]["Push", {#, dist["Part", First[#]] + dist["Part", Last[#]] + edgeWeight[graph, #]}];
+toHeapify["Part", cent["Part", Last[#]]]["Push", {#, dist["Part", First[#]] + dist["Part", Last[#]] + edgeWeight[graph, #]}];boundaryEdges["Part", cent["Part", First[#]]]["Push", #];boundaryEdges["Part", cent["Part", Last[#]]]["Push", #];)&,
+baseBoundaryEdges];
+
+Scan[(lheap[#]=leftistHeapHeapify[Normal@toHeapify["Part", #]])&, treeVertices];
+
+(* 
 Scan[(lheap[#]=leftistHeapCreate[])&, treeVertices];
 Scan[
 (leftistHeapPush[lheap[cent["Part", First[#]]], {#, dist["Part", First[#]] + dist["Part", Last[#]] + edgeWeight[graph, #]}];
 leftistHeapPush[lheap[cent["Part", Last[#]]], {#, dist["Part", First[#]] + dist["Part", Last[#]] + edgeWeight[graph, #]}];boundaryEdges["Part", cent["Part", First[#]]]["Push", #];boundaryEdges["Part", cent["Part", Last[#]]]["Push", #];)&,
-baseBoundaryEdges];
+baseBoundaryEdges];*)
 
 (* tree rooting *)
 {root, depth, parent, children} = rootTreeKeyPath[tree, graphVertexNumber, terminals];

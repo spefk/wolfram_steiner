@@ -3,12 +3,13 @@
 BeginPackage["Steiner`Generator`"];
 
 
-generateSteinerProblemInstanceRG::usage = "Like generateSteinerProblemInstance but customizable edges";
-generateSteinerProblemInstance::usage =
+generateSteinerProblemInstanceRG::usage   = "Like generateSteinerProblemInstance but customizable edges.";
+generateSteinerProblemInstanceGrid::usage = "Generates grid graph steiner problem.";
+generateSteinerProblemInstance::usage     =
 "Input: n \[Dash] vertex number; t \[Dash] terminal number.
 Options: BernoulliProbablility \[Dash] probability for BernoulliGraphDistribution, WeightBounds \[Dash] {x, y} \[Dash] random weight upper and lower bounds.
 Output: {<Connected weighted graph>, edgeWeights_Association, terminals_List}";
-generate2DSteinerProblemInstance::usage = "Same as generateSteinerProblemInstance, but 2D and reutrns coordinates in addition, and takes m = #E.";
+generate2DSteinerProblemInstance::usage   = "Same as generateSteinerProblemInstance, but 2D and reutrns coordinates in addition, and takes m = #E.";
 
 
 Begin["`Private`"];
@@ -74,6 +75,20 @@ weightAssociation = Association@@((#->EuclideanDistance[vertsMap[#[[1]]], vertsM
 {Graph[Range@n, UndirectedEdge@@@edges, EdgeWeight->Values@weightAssociation, VertexCoordinates->coords],
 weightAssociation,
 RandomSample[Range@n, t]}
+]
+
+
+ClearAll[generateSteinerProblemInstanceGrid]
+
+generateSteinerProblemInstanceGrid[r_, c_, t_]:=
+Module[{graph, weightAssociation},
+
+graph =  GridGraph[{r, c}];
+
+weightAssociation = Association[#->1&/@EdgeList[graph]];
+
+{Graph[graph, EdgeWeight->Values@weightAssociation],
+RandomSample[VertexList[graph], t]}
 ]
 
 

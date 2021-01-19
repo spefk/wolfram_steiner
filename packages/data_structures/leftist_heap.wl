@@ -17,6 +17,7 @@ leftistExtractMin::usage            =    "To extract <elem> with !lowest! priori
 leftistHeapQ::usage                 =    "Checks (lightly) if argument is leftist heap.";
 leftistHeapPeek::usage              =    "Get key of minimum element, but not extract it.";
 leftistHeapExtractAll::usage        =    "Get all elements heap contains in arbitrary order.";
+leftistHeapDraw::usage              =    "Visualises Leftist Heap as graph.";
 
 
 Begin["`Private`"];
@@ -117,7 +118,17 @@ ClearAll[leftistHeapExtractAll, leftistHeapExtractAllRec]
 
 leftistHeapExtractAll[{xe_, xp_, xd_, xl_, xr_ }] := Reap[leftistHeapExtractAllRec[{xe, xp, xd, xl, xr}]][[2, 1]]
 leftistHeapExtractAllRec[{xe_, xp_, xd_, xl_, xr_ }] := (Sow[xe];leftistHeapExtractAllRec[xl];leftistHeapExtractAllRec[xr];)
-leftistHeapExtractAllRec[{}] := Null 
+leftistHeapExtractAllRec[{}] := Nothing 
+
+
+ClearAll[leftistHeapDraw]
+
+leftistHeapDraw[x:{xe_, xp_, xd_, xl_, xr_ }] := Graph[{leftistHeapDrawRec[x]}, VertexLabels->Automatic, ImageSize->150]
+leftistHeapDrawRec[{xe_, xp_, xd_, y:{ye_, yp_, yd_, yl_, yr_ }, z:{ze_, zp_, zd_, zl_, zr_ } }] :=
+Sequence[DirectedEdge[{xe, xp}, {ye, yp}], DirectedEdge[{xe, xp}, {ze, zp}], leftistHeapDrawRec[y], leftistHeapDrawRec[z]] 
+leftistHeapDrawRec[{xe_, xp_, xd_, {}, z:{ze_, zp_, zd_, zl_, zr_ } }] := Sequence[DirectedEdge[{xe, xp}, {ze, zp}], leftistHeapDrawRec[z]] 
+leftistHeapDrawRec[{xe_, xp_, xd_, y:{ye_, yp_, yd_, yl_, yr_ }, {} }] := Sequence[DirectedEdge[{xe, xp}, {ye, yp}], leftistHeapDrawRec[y]] 
+leftistHeapDrawRec[{xe_, xp_, xd_, {}, {} }] := Nothing 
 
 
 End[];

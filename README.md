@@ -1,12 +1,12 @@
 # wolfram_steiner
-### Wolfram Mathematica steiner tree problem solving package.
+## Wolfram Mathematica steiner tree problem solving package.
 
 Exact methods:
 1. (DW) Dreyfus-Wagner algorithm, straight dynamic realisation O(n 3^t + n^2 2^t + poly())
 
 Approximation:
 1. (DNH) Kou-Markowsky-Berman 2-approximation algorithm O(|T| n log(m)).
-2. (DNHA)Mehlhorn 2-approximation algorithm O(n log(m)).
+2. (DNHA) Mehlhorn 2-approximation algorithm O(n log(m)).
 
 Greedy:
 1. (SPH) Shortest path heuristic O(|T| n log(m)).
