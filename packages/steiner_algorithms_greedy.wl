@@ -18,8 +18,6 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization::Plain:: *)
-ClearAll[steinerShortestPathHeuristic]
-
 steinerShortestPathHeuristic[graph_, terminals_, startTerminal_]:=
 Module[{n = VertexCount@graph, t = Length@terminals,
 dist, anc, tree, inTree, candidates, curEdge, curVert, curPath, curAnc, dij},
@@ -82,8 +80,6 @@ DeleteDuplicates[#]&
 
 
 (* ::Input::Initialization::Plain:: *)
-ClearAll[steinerRepeatedShortestPathHeuristic]
-
 steinerRepeatedShortestPathHeuristic[graph_, terminals_, it_:100]:=
 Composition[
 MinimalBy[#, Last][[1, 1]]&,

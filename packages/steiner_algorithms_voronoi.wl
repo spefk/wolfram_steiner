@@ -10,13 +10,11 @@ dijkstraVoronoi::usage         = "Finds voronoi diagramm of graph. Returns: \[Le
 dijkstraFindPath::usage        = "Finds path of edges from <vert>'s voronoi terminal to <vert> according to <anc>.";
 voronoiBoundaryPath::usage     = "Get path vor boundary edge.";
 voronoiBoundaryPathCost::usage = "Get shortest path for boundary edge cost.";
-repairVoronoi::usage           = "Used in Key-path Exchange. Recalculates voronoi for the subset of current terminals (centers) using data from original voronoi and returns edge denoting a minmal path between set u belongs and other.";
+repairVoronoi::usage           = "Used in Key-path Exchange. Recalculates voronoi for the subset of current terminals (centers) using data from original voronoi and returns edge denoting a minmal path between set u belongs and other. Uses <borderEdges> to reinitialize algorithm from vertices on border.";
 
 
 Begin["`Private`"];
 
-
-ClearAll[dijkstraVoronoi]
 
 dijkstraVoronoi[graph_Graph, terminals_]:=
 Module[
@@ -69,8 +67,6 @@ dijkstraFindPathRec[-1, anc_]        := Nothing
 
 
 (* ::Input::Initialization::Plain:: *)
-ClearAll[repairVoronoi]
-
 repairVoronoi[graph_Graph, terminals_, lostCenters_, distOld_, ancOld_, centOld_, boundaryEdges_, disj_, uDown_] :=
 Block[{processEdge},
 Module[
@@ -126,8 +122,6 @@ bestPath
 ]
 ]
 
-
-ClearAll[voronoiBoundaryPath, voronoiBoundaryPathRec]
 
 voronoiBoundaryPath[Null, _, _] = Null
 voronoiBoundaryPath[edge_, par_, centers_]/;centers["Part", First[edge]]!=centers["Part", Last[edge]]:=

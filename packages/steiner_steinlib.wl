@@ -12,17 +12,13 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization::Plain:: *)
-ClearAll[stlibFormat]
 stlibFormat = "*.stp";
 
 
-ClearAll[getInstancesList]
 getInstancesList[path_] := FileNames[stlibFormat, path]
 
 
 (* ::Code::Initialization::Plain:: *)
-ClearAll[importSteinLibInstance]
-
 importSteinLibInstance[libPath_]:=
 Composition[
 {Graph[Keys@First[#], EdgeWeight->Values@First[#]], Association@First[#], Last[#]}&,
@@ -37,8 +33,6 @@ Import[#, "Data"]&
 
 
 (* ::Input::Initialization::Plain:: *)
-ClearAll[importSteinnstanceList]
-
 importSteinLibInstanceList[pathList:{__String}]:=importSteinLibInstance[#]&/@pathList
 
 

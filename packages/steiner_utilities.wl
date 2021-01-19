@@ -12,8 +12,6 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization::Plain:: *)
-ClearAll[clearAndProtect]
-
 SetAttributes[clearAndProtect, {HoldAll, Listable}]
 
 clearAndProtect[what_Symbol]:=
@@ -23,11 +21,8 @@ Protect[what];)
 
 
 (* ::Input::Initialization::Plain:: *)
-ClearAll[timeDecorator]
 timeDecorator[tag_]:=(Sow[#[[1]], tag];[[2]])&[AbsoluteTiming[#]]&
 
-
-ClearAll[steinerSolutionQ]
 
 steinerSolutionQ[tree_, terminals_]:= ConnectedGraphQ@Graph[tree]\[And]ContainsAll[VertexList@tree, terminals]
 

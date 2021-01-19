@@ -19,14 +19,10 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization::Plain:: *)
-ClearAll[terminalVertexStyle]
-
 terminalVertexStyle[terminals_]:=(#->{Red}&/@terminals)
 
 
 (* ::Input::Initialization::Plain:: *)
-ClearAll[voronoiVertexStyle]
-
 voronoiVertexStyle[vertexList_, snm_List]:=
 Composition[
 Thread[vertexList->#]&,
@@ -37,7 +33,6 @@ DeleteDuplicates[snm]&
 
 
 (* ::Input::Initialization::Plain:: *)
-ClearAll[drawGraph]
 clearAndProtect@{VertexStyleFunc, TerminalSize, TerminalShape};
 
 Options[drawGraph] = Join[Options[Graph], {VertexStyleFunc -> {}, TerminalSize->0.5, TerminalShape->"Square"}];
@@ -55,8 +50,6 @@ ImageSize -> 300}]
 
 
 (* ::Input::Initialization::Plain:: *)
-ClearAll[drawGraphSubgraph]
-
 Options[drawGraphSubgraph] = Join[Options[Graph], {VertexStyleFunc -> {}, TerminalSize->0.5, TerminalShape->"Square"}];
 
 drawGraphSubgraph[graph_Graph, subgraphEdges_, terminalVertices_,  opts:OptionsPattern[]]:= 
@@ -66,8 +59,6 @@ FilterRules[{opts}, Options[drawGraph]]]
 
 
 (* ::Input::Initialization::Plain:: *)
-ClearAll[drawGraphSubgraphDifference]
-
 Options[drawGraphSubgraphDifference] = Join[Options[Graph], {VertexStyleFunc -> {}, TerminalSize->0.5, TerminalShape->"Square"}];
 
 drawGraphSubgraphDifference[graph_Graph, subgraphEdges_, subgraphEdgesOld_, terminalVertices_,  opts:OptionsPattern[]]:= 
@@ -80,8 +71,6 @@ FilterRules[{opts}, Options[drawGraph]]]
 
 
 (* ::Input::Initialization::Plain:: *)
-ClearAll[gridResult]
-
 Options[gridResult] = Join[Options[Graph], {VertexStyleFunc -> {}, TerminalSize->0.5, TerminalShape->"Square"}];
 
 gridResult[graph_Graph, terminals_, tree_, treeWeight_, opts:OptionsPattern[]]:=
@@ -92,8 +81,6 @@ treeWeight}}, Frame->All]
 
 
 (* ::Input::Initialization::Plain:: *)
-ClearAll[gridResultCompare]
-
 Options[gridResultCompare] = Join[Options[Graph], {VertexStyleFunc -> {}, TerminalSize->0.5, TerminalShape->"Square"}];
 
 gridResultCompare[graph_Graph,  terminals_, tree_, treeOld_, treeWeight_, opts:OptionsPattern[]]:=

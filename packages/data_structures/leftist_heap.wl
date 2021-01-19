@@ -24,22 +24,16 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization::Plain:: *)
-ClearAll[leftistHeapQ]
-
 leftistHeapQ[heap_]:= MatchQ[heap, {_, _, _Integer, _List, _List}]
 
 
 (* ::Input::Initialization::Plain:: *)
-ClearAll[leftistHeapCreate]
-
 (*({priority, element, closest leaf distance, left child, right child})*)
 leftistHeapCreate[] := {}
 leftistHeapCreate[{elem_, priority_}] := {elem, priority, 0, {}, {}}
 
 
 (* ::Input::Initialization::Plain:: *)
-ClearAll[leftistHeapMeldSwap, leftistHeapMeldRecalcDistance, leftistHeapMeld, leftistHeapMeldClearly]
-
 leftistHeapMeldSwap[x:{xe_, xp_, xd_, xl_, xr_ }, y:{ye_, yp_, yd_, yl_, yr_}] := Sequence[x, y]
 leftistHeapMeldSwap[x:{xe_, xp_, xd_, xl_, xr_ }, y:{ye_, yp_, yd_, yl_, yr_}]/;xd<yd := Sequence[y, x]
 leftistHeapMeldSwap[x_, {}] := Sequence[x, {}]
@@ -57,8 +51,6 @@ leftistHeapMeld[{}, y_] := y
 
 leftistHeapMeld[x_, y_, z__List] := Fold[leftistHeapMeld, x, {y, z}]
 
-
-ClearAll[leftistHeapMeldClearly, leftistHeapMeldClearlyList]
 
 SetAttributes[leftistHeapMeldClearly, HoldAll]
 leftistHeapMeldClearly[new_, x_, y_]:=
@@ -79,8 +71,6 @@ ReleaseHold@Map[Unevaluated, {Hold@x}, {2}]];)
 
 
 (* ::Input::Initialization::Plain:: *)
-ClearAll[leftistHeapHeapify, leftistHeapHeapifyStep]
-
 leftistHeapHeapify[toAdd:{__List}]:=
 Block[{$RecursionLimit=Infinity},
 leftistHeapHeapifyStep[toAdd]
@@ -92,14 +82,11 @@ leftistHeapHeapifyStep[toAdd:{x_List}] := leftistHeapCreate[x]
 
 
 (* ::Input::Initialization::Plain:: *)
-ClearAll[leftistHeapPush]
 SetAttributes[leftistHeapPush, HoldFirst]
 leftistHeapPush[heap_, {elem_, priority_}] := Unevaluated[heap]=leftistHeapMeld[heap, leftistHeapCreate[{elem, priority}]]
 
 
 (* ::Input::Initialization::Plain:: *)
-ClearAll[leftistExtractMin]
-
 SetAttributes[leftistExtractMin, HoldFirst]
 leftistExtractMin[heap_] :=
 If[MatchQ[Catch[Quiet@Check[First[heap], Throw["EmptyHeap"]]],"EmptyHeap"],
@@ -109,19 +96,13 @@ Null,
 
 
 
-ClearAll[leftistHeapPeek]
-
 leftistHeapPeek[{xe_, xp_, xd_, xl_, xr_ }] := xe;
 
-
-ClearAll[leftistHeapExtractAll, leftistHeapExtractAllRec]
 
 leftistHeapExtractAll[{xe_, xp_, xd_, xl_, xr_ }] := Reap[leftistHeapExtractAllRec[{xe, xp, xd, xl, xr}]][[2, 1]]
 leftistHeapExtractAllRec[{xe_, xp_, xd_, xl_, xr_ }] := (Sow[xe];leftistHeapExtractAllRec[xl];leftistHeapExtractAllRec[xr];)
 leftistHeapExtractAllRec[{}] := Nothing 
 
-
-ClearAll[leftistHeapDraw]
 
 leftistHeapDraw[x:{xe_, xp_, xd_, xl_, xr_ }] := Graph[{leftistHeapDrawRec[x]}, VertexLabels->Automatic, ImageSize->150]
 leftistHeapDrawRec[{xe_, xp_, xd_, y:{ye_, yp_, yd_, yl_, yr_ }, z:{ze_, zp_, zd_, zl_, zr_ } }] :=

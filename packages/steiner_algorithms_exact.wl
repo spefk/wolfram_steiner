@@ -15,8 +15,6 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization::Plain:: *)
-Clear[runDreyfusWagner]
-
 runDreyfusWagner[graph_Graph, terminals_]:=
 Block[
 {vertList = VertexList@graph,

@@ -27,8 +27,6 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization::Plain:: *)
-ClearAll[steinerVertexInsertion, steinerVertexInsertionFixedPoint]
-
 steinerVertexInsertion[graph_, tree_]:=
 Block[{tryAddVertex},
 With[{graphVertices = VertexList@graph},
@@ -38,9 +36,10 @@ solWeight, solution = tree},
 tryAddVertex[v_]:=
 Composition[
 If[ConnectedGraphQ[#[[1]]]\[And]solWeight > #[[2]], 
-solWeight        = #[[2]];
+Sow[{solution, EdgeList[#[[1]]], "VI"}, "SolutionChange"];
+solWeight        =  #[[2]];
 solution         = EdgeList[#[[1]]];
-treeVertices =  VertexList[solution];]&,
+treeVertices          =  VertexList[solution];]&,
 {#,  edgeWeightSum[graph, EdgeList[#]]}&,
 FindSpanningTree[#]&,
 Subgraph[graph, Union[treeVertices, {#}]]&
@@ -64,8 +63,6 @@ steinerVertexInsertionFixedPoint[graph_, tree_, maxSteps_:Infinity]:=FixedPoint[
 
 
 (* ::Input::Initialization::Plain:: *)
-ClearAll[steinerVertexElimination, steinerVertexEliminationFixedPoint]
-
 steinerVertexElimination[graph_, tree_, terminals_] :=
 Block[{tryEliminateVertex},
 Module[{treeVertices = VertexList@tree, solution=tree, solWeight},
@@ -74,6 +71,7 @@ solWeight = edgeWeightSum[graph, EdgeList[tree]];
 tryEliminateVertex[v_] :=
 Composition[
 If[ConnectedGraphQ[#[[1]]] \[And] solWeight > #[[2]],
+Sow[{solution, EdgeList[#[[1]]], "VE"}, "SolutionChange"];
 solWeight = #[[2]];
 solution = EdgeList[#[[1]]];
 treeVertices = VertexList @ solution;]&,
@@ -94,8 +92,6 @@ steinerVertexEliminationFixedPoint[graph_, tree_, terminals_, maxSteps_:Infinity
 (* Steiner vertex elimination and steiner vertex insertion *)
 
 
-ClearAll[steinerVIVE, steinerVIVEFixedPoint]
-
 steinerVIVE[graph_, tree_, terminals_] :=
 Composition[
 steinerVertexElimination[graph, #, terminals]&,
@@ -109,14 +105,10 @@ steinerVIVEFixedPoint[graph_, tree_, terminals_, maxStep_:Infinity]:= FixedPoint
 
 
 (* ::Input::Initialization::Plain:: *)
-ClearAll[crucialQ]
-
 crucialQ[v_, tree_, terminals_]:=MemberQ[terminals, v]\[Or](VertexDegree[tree, v]>=3)
 
 
 (* ::Input::Initialization::Plain:: *)
-ClearAll[rootTreeKeyPath]
-
 rootTreeKeyPath[tree_, graphVertexNumber_, terminals_]:=
 Module[{root, depth, parent, children},
 root        = FirstCase[VertexList@tree, x_/;crucialQ[x, tree, terminals]];
@@ -135,8 +127,6 @@ parent["SetPart", #1, #2];)&)}];
 
 
 (* ::Input::Initialization::Plain:: *)
-ClearAll[steinerKeyPathExchange]
-
 steinerKeyPathExchange[graph_, tree_, terminals_]:=
 Block[{lheap, dfs, tryEliminatePath,
 extractMinUntill,downUpEdgeQ,currentInternalKeyPath},
@@ -269,6 +259,7 @@ True, {-1, {}}
 
 dfs[root];
 Sow[eliminatedPath, "elimPath"];
+Sow[{treeEdges, solution, "PE"}, "SolutionChange"];
 solution
 
 ]
@@ -277,15 +268,10 @@ solution
 
 
 (* ::Input::Initialization::Plain:: *)
-ClearAll[steinerKeyPathExchangeFixedPoint]
-
 steinerKeyPathExchangeFixedPoint[graph_, tree_, terminals_]:= FixedPoint[steinerKeyPathExchange[graph, #, terminals]&, tree]
 
 
-
 (* ::Input::Initialization::Plain:: *)
-ClearAll[steinerPEVIVE]
-
 steinerPEVIVE[graph_, tree_, terminals_]:=
 Composition[
 steinerVertexElimination[graph, #, terminals]&,
@@ -296,8 +282,6 @@ steinerKeyPathExchange[graph, #, terminals]&
 
 
 (* ::Input::Initialization::Plain:: *)
-ClearAll[steinerPEVIVEFixedPoint]
-
 steinerPEVIVEFixedPoint[graph_, tree_, terminals_]:= FixedPoint[steinerPEVIVE[graph, #, terminals]&, tree]
 
 

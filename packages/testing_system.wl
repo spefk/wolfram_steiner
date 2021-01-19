@@ -21,20 +21,15 @@ PLCHDR=PLCHDR;
 Protect[PLCHDR];
 
 
-ClearAll[dismemberFunction]
 SetAttributes[dismemberFunction, HoldAll]
 
 dismemberFunction[f_[args___, opts___Rule]] := {f, List@args, List@opts}
 
 
-ClearAll[setMarked]
-
 setMarked[where_, values_] := ReplacePart[where, Thread[Position[where, PLCHDR]->values]]
 
 setMarked[where_, values_] := Throw["WrongMarksNumber"]/;Count[where, PLCHDR]!=Length[values]
 
-
-ClearAll[testFunction]
 
 testFunction[
 function : _Symbol|_Function,
@@ -48,8 +43,6 @@ Table[AbsoluteTiming@function[Sequence@@arguments], it]&
 ][]
 
 
-
-ClearAll[testFunctionRandom]
 
 testFunctionRandom[
 function        : _Symbol|_Function, arguments_List,
@@ -70,8 +63,6 @@ Table[AbsoluteTiming@func[rndGen[]], it]&
 ]
 
 
-ClearAll[testFunctionUndivided]
-
 SetAttributes[testFunctionUndivided, HoldAll]
 testFunctionUndivided[function_[fArgs___, fOpts___Rule], it_Integer:1000]:=
 Module[{func, funcArgs, funcOpts},
@@ -79,8 +70,6 @@ Module[{func, funcArgs, funcOpts},
 testFunction[func[##, Sequence@@funcOpts]&, funcArgs, it]
 ]
 
-
-ClearAll[testFunctionRandomUndivided]
 
 SetAttributes[testFunctionRandomUndivided, HoldAll]
 testFunctionRandomUndivided[function_[fArgs___, fOpts___Rule],
@@ -93,14 +82,10 @@ testFunctionRandom[func[##, Sequence@@funcOpts]&, funcArgs, gen[##, Sequence@@ge
 ]
 
 
-ClearAll[tester]
-
 tester[function : _Symbol|_Function, functionListOfInputs : {__List}, it_:10, aggrFunc_:Min]:=
 Table[{f, testFunction[function, f, it, aggrFunc]}, {f, functionListOfInputs}]
 
 
-
-ClearAll[testerRandom]
 
 testerRandom[function        : _Symbol|_Function,        functionListOfInputs : {__List},
 	         randomGenerator : _Symbol|_Function,        generatorListOfInputs : {__List},

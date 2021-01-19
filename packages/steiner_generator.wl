@@ -15,8 +15,6 @@ generate2DSteinerProblemInstance::usage   = "Same as generateSteinerProblemInsta
 Begin["`Private`"];
 
 
-ClearAll[generateSteinerProblemInstanceRG]
-
 Options[generateSteinerProblemInstanceRG] = {WeightBounds ->{1, 100}};
 
 generateSteinerProblemInstanceRG[n_:10, m_:15, t_:3, opts:OptionsPattern[]]:=
@@ -35,8 +33,6 @@ RandomSample[VertexList[graph], t]}
 ]
 
 
-ClearAll[generateSteinerProblemInstance]
-
 Options[generateSteinerProblemInstance] = {BernoulliProbability -> 0.15, WeightBounds ->{1, 100}};
 
 generateSteinerProblemInstance[n_:10, t_:3, opts:OptionsPattern[]]:=
@@ -54,8 +50,6 @@ weightAssociation,
 RandomSample[VertexList[graph], t]}
 ]
 
-
-ClearAll[generate2DSteinerProblemInstance, generate2DSteinerProblemInstanceStep]
 
 generate2DSteinerProblemInstance[n_:15, t_:3]:=
 Module[{out = {}},
@@ -77,8 +71,6 @@ weightAssociation,
 RandomSample[Range@n, t]}
 ]
 
-
-ClearAll[generateSteinerProblemInstanceGrid]
 
 generateSteinerProblemInstanceGrid[r_, c_, t_]:=
 Module[{graph, weightAssociation},

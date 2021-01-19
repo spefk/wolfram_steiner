@@ -14,8 +14,6 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization::Plain:: *)
-ClearAll[dijkstra]
-
 dijkstra[graph_, start_]:=
 Module[{n = VertexCount@graph, curVert, curWeight, queue, anc, dist, used},
 queue          = CreateDataStructure["PriorityQueue"];
@@ -47,8 +45,6 @@ AdjacencyList[graph, curVert]
 <|"distance"->dist, "ancestors"->anc|>
 ]
 
-
-ClearAll[dijkstraPath, dijkstraPathRec]
 
 dijkstraPath[curVert_Integer, anc_] := {dijkstraPathRec[curVert, anc]}
 dijkstraPathRec[curVert_Integer, anc_] := Sequence[dijkstraPathRec[anc["Part", curVert], anc], curVert]

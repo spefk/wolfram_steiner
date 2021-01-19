@@ -31,7 +31,6 @@ Begin["`Private`"];
 
 
 (* ::Input::Initialization::Plain:: *)
-ClearAll[getMetricClosureOfGraphTerminals, getMetricClosureOfGraphTerminalsTedges]
 getMetricClosureOfGraphTerminalsTedges[graph_, terminals_, t_]:=
 Composition[
 Function[weights, UndirectedEdge[Sequence@@Sort[{t, #}]]->weights[[#]]&/@Complement[terminals, {t}]][#]&,
@@ -48,8 +47,6 @@ getMetricClosureOfGraphTerminalsTedges[graph, terminals, #]&/@terminals&
 
 
 (* ::Input::Initialization::Plain:: *)
-ClearAll[runKouMarkowskyBerman]
-
 runKouMarkowskyBerman[graph_Graph, terminals_]:=
 Module[{minSpanningTreeEdges},
 
@@ -85,8 +82,6 @@ FindShortestPath[graph, #[[1]], #[[2]]]&/@#&
 
 
 (* ::Input::Initialization::Plain:: *)
-ClearAll[runMehlhorn]
-
 runMehlhorn[graph_, terminals_]:=
 Module[
 {dijVoronoi, vor, sp, auxilaryEdgeWeights},
