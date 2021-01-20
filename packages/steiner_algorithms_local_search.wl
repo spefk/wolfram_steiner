@@ -26,7 +26,6 @@ Begin["`Private`"];
 (* Steiner vertex insertion *)
 
 
-(* ::Input::Initialization::Plain:: *)
 steinerVertexInsertion[graph_, tree_]:=
 	Block[{tryAddVertex},
 		With[{graphVertices = VertexList@graph},
@@ -133,8 +132,8 @@ rootTreeKeyPath[tree_, graphVertexNumber_, terminals_]:=
 
 steinerKeyPathExchange[graph_, tree_, terminals_]:=
 	Block[{lheap, dfs, tryEliminatePath,
-		extractMinUntill,downUpEdgeQ,currentInternalKeyPath},
-	currentInternalKeyPath = CreateDataStructure["Stack"];
+		extractMinUntill, downUpEdgeQ, currentInternalKeyPath},
+		currentInternalKeyPath = CreateDataStructure["Stack"];
 		With[
 			{
 				treeVertexNumber  = VertexCount@tree,
@@ -146,7 +145,7 @@ steinerKeyPathExchange[graph_, tree_, terminals_]:=
 			},
 			Module[
 				{voronoi, dist, anc, cent, heapArray, solution,
-				root, depth, parent, children,graphTreeEdges, disj, time,
+				root, depth, parent, children, graphTreeEdges, disj,
 				baseBoundaryEdges, eliminatedPath, boundaryEdges, toHeapify},
 
 				solution       = treeEdges;
@@ -170,10 +169,12 @@ steinerKeyPathExchange[graph_, tree_, terminals_]:=
 				Scan[toHeapify["SetPart", #, CreateDataStructure["Stack"]]&, treeVertices];
 
 				Scan[
-				(toHeapify["Part", cent["Part", First[#]]]["Push", {#, dist["Part", First[#]]
-					+ dist["Part", Last[#]] + edgeWeight[graph, #]}];
-				toHeapify["Part", cent["Part", Last[#]]]["Push", {#, dist["Part", First[#]]
-					+ dist["Part", Last[#]] + edgeWeight[graph, #]}];boundaryEdges["Part", cent["Part", First[#]]]["Push", #];boundaryEdges["Part", cent["Part", Last[#]]]["Push", #];)&,
+					(toHeapify["Part", cent["Part", First[#]]]["Push", {#, dist["Part", First[#]]
+						+ dist["Part", Last[#]] + edgeWeight[graph, #]}];
+					toHeapify["Part", cent["Part", Last[#]]]["Push", {#, dist["Part", First[#]]
+						+ dist["Part", Last[#]] + edgeWeight[graph, #]}];
+					boundaryEdges["Part", cent["Part", First[#]]]["Push", #];
+					boundaryEdges["Part", cent["Part", Last[#]]]["Push", #];)&,
 				baseBoundaryEdges];
 
 				Scan[(lheap[#]=leftistHeapHeapify[Normal@toHeapify["Part", #]])&, treeVertices];
@@ -184,29 +185,32 @@ steinerKeyPathExchange[graph_, tree_, terminals_]:=
 				(* To keep all vertices of processed sub-tree in one set. *)
 				disj = CreateDataStructure["DisjointSet"];
 				Scan[disj["Insert", #]&, treeVertices];
+				disj["Insert", "Forbidden"];
 
-				downUpEdgeQ[v_, u_, down_, disj_]:=
+				downUpEdgeQ[v_, u_, down_, disj_, internalPath_]:=
 					And[
 						Xor[disj["CommonSubsetQ", cent["Part", v], down],
 							disj["CommonSubsetQ", cent["Part", u], down]],
-						And[FreeQ[Normal@currentInternalKeyPath, cent["Part", v]],
-							FreeQ[Normal@currentInternalKeyPath, cent["Part", u]]]
+						And[FreeQ[internalPath, cent["Part", v]],
+							FreeQ[internalPath, cent["Part", u]]],
+						Nor[disj["CommonSubsetQ", cent["Part", v], "Forbidden"],
+							disj["CommonSubsetQ", cent["Part", u], "Forbidden"]]
 					];
 
-				extractMinUntill[heapID_]:=
+				extractMinUntill[heapID_, internalPath_]:=
 					NestWhile[
 						leftistExtractMin[lheap[heapID]]&,
 						Null,
-						!MatchQ[#, Null]\[And]!downUpEdgeQ[cent["Part", First@#], cent["Part", Last@#], heapID, disj]&,
+						!MatchQ[#, Null]\[And]!downUpEdgeQ[cent["Part", First@#], cent["Part", Last@#], heapID, disj, internalPath]&,
 						{2,1}
 					];
 
 				tryEliminatePath[pathStack_, u_, v_]:=
 					Module[
 						{
-							edgeBase, brokenTree, tabuVertices,
-							baseBit, bottomTree, upperTree,
-							deletedZones, curBoundaryEdges, path, paths,
+							edgeBase, brokenTree,
+							baseBit, bottomTree, upperTree, prevSol, curPathWeight,
+							deletedZones, curBoundaryEdges, path, pathFinal,
 							currentInternalKeyPathNormal = Normal@currentInternalKeyPath
 						},
 						
@@ -216,30 +220,35 @@ steinerKeyPathExchange[graph_, tree_, terminals_]:=
 						bottomTree = First@ConnectedGraphComponents[brokenTree, u];
 						upperTree  = First@ConnectedGraphComponents[brokenTree, v];
 
-						edgeBase = extractMinUntill[u];
+						edgeBase = extractMinUntill[u, currentInternalKeyPathNormal];
 
 						curBoundaryEdges = Normal[boundaryEdges["Part", #]]&/@currentInternalKeyPathNormal;
 						curBoundaryEdges = Select[Flatten[Join@@curBoundaryEdges],
-							Xor[
-								MemberQ[currentInternalKeyPathNormal, cent["Part", First[#]]],
-								MemberQ[currentInternalKeyPathNormal, cent["Part", Last[#]]]]&];
-							Sow[curBoundaryEdges, "boundEdges"];
+												And[True,
+													Xor[
+														MemberQ[currentInternalKeyPathNormal, cent["Part", First[#]]],
+														MemberQ[currentInternalKeyPathNormal, cent["Part", Last[#]]]]
+												]
+											&];
+						pathFinal =
+							DeleteCases[
+								{voronoiBoundaryPath[edgeBase, anc, cent],
+								repairVoronoi[graph, terminals, currentInternalKeyPathNormal,
+										      dist, anc, cent, curBoundaryEdges, disj, u]},
+							Null];
 
-						paths =
-						DeleteCases[
-							{voronoiBoundaryPath[edgeBase, anc, cent],
-							repairVoronoi[graph, terminals, currentInternalKeyPathNormal,
-									      dist, anc, cent, curBoundaryEdges, disj, u]},
-						Null];
-
-						If[!MatchQ[paths, {}], 
-							paths = MinimalBy[paths, edgeWeightSum[graph, #]&][[1]];
-							If[edgeWeightSum[graph, paths] < edgeWeightSum[graph, path],
-								solution = Join[Complement[treeEdges, path, SameTest->(ContainsExactly[List@@#1, List@@#2]&)], paths];
-								eliminatedPath = {paths, path};
-							];
+						If[!MatchQ[pathFinal, {}],
+							Sow[pathFinal, "help"];
+							pathFinal = SortBy[pathFinal, edgeWeightSum[graph, #]&][[1]];
+							If[edgeWeightSum[graph, pathFinal] < edgeWeightSum[graph, path],
+								prevSol = solution;
+								solution = Join[EdgeList[GraphDifference[solution, path]], pathFinal];
+								disj["Unify", u, "Forbidden"];
+								disj["Unify", #, "Forbidden"]&/@Cases[Flatten[List@@@pathFinal], x_/;VertexDegree[pathFinal, x] == 1];
+								disj["Unify", #, "Forbidden"]&/@currentInternalKeyPathNormal;
+								Sow[{prevSol, solution, "PE"}, "SolutionChange"];
+							]
 						];
-						tabuVertices = Join[VertexList@bottomTree, Normal@currentInternalKeyPath];
 					];
 
 				dfs[v_]:=
@@ -248,39 +257,42 @@ steinerKeyPathExchange[graph_, tree_, terminals_]:=
 
 						successors = Normal[children["Part", v]];
 
-						prevCrus = -1;
+						prevCrus = Null;
 						path = Null;
 
 						Scan[Function[child,
 							({prevCrus, path} = dfs[child];
 							Switch[
-								{prevCrus, crucialQ[v, treeEdges, terminals]},
-								{-1      , _}   , Nothing,
+								{prevCrus, crucialQ[v, treeEdges, terminals]\[And]!disj["CommonSubsetQ", v, "Forbidden"]},
+								{Null    , _}   , Nothing,
 								{_Integer, True}, (tryEliminatePath[path, prevCrus, v];
-									              Map[leftistHeapMeldClearly[lheap[v], lheap[#]]&, Normal@currentInternalKeyPath];
-					    						  currentInternalKeyPath["DropAll"];),
+			    								  leftistHeapMeldClearly[lheap[v], lheap[#]]&/@Normal[currentInternalKeyPath];
+			    								  currentInternalKeyPath["DropAll"];), 
 								_               , Nothing
 							];
-
-							disj["Unify", v, #];)][#]&,
+							If[!disj["CommonSubsetQ", #, "Forbidden"],
+								disj["Unify", v, #];]
+							;)][#]&,
 						successors];
 
 						Which[
+							disj["CommonSubsetQ", v, "Forbidden"],
+								currentInternalKeyPath["DropAll"];
+								{Null, {}},
 							crucialQ[v, treeEdges, terminals],
-								(path = CreateDataStructure["Stack"];
+								path = CreateDataStructure["Stack"];
 								path["Push", UndirectedEdge[v, parent["Part", v]]];
-								{v, path}),
-							Length@successors == 1 \[And] !MatchQ[prevCrus, -1],
-								(currentInternalKeyPath["Push", v];
+								{v, path},
+							Length@successors == 1 \[And] !MatchQ[prevCrus, Null],
+								currentInternalKeyPath["Push", v];
 								path["Push", UndirectedEdge[v, parent["Part", v]]];
-								{prevCrus, path}),
+								{prevCrus, path},
 							True,
-								{-1, {}}
+								{Null, {}}
 						]
 					];
 
 				dfs[root];
-				Sow[{treeEdges, solution, "PE"}, "SolutionChange"];
 				solution
 			]
 		]

@@ -71,73 +71,76 @@ repairVoronoi[
 graph_Graph, terminals_, lostCenters_,
 distOld_, ancOld_, centOld_,
 boundaryEdges_, disj_, uDown_] :=
-Block[
-	{processEdge},
-	Module[
-		{
-			dist           = distOld["Copy"],
-			anc            = ancOld["Copy"],
-			cent           = centOld["Copy"],
-			heap           = CreateDataStructure["PriorityQueue"],
-			used           = CreateDataStructure["BitVector", VertexCount[graph] + 1],
-			bestPathWeight = Infinity,
-			bestPath       = Null,
-			curWeight, curVert
-		},
+	Block[
+		{processEdge},
+		Module[
+			{
+				dist           = distOld["Copy"],
+				anc            = ancOld["Copy"],
+				cent           = centOld["Copy"],
+				heap           = CreateDataStructure["PriorityQueue"],
+				used           = CreateDataStructure["BitVector", VertexCount[graph] + 1],
+				bestPathWeight = Infinity,
+				bestPath       = Null,
+				curWeight, curVert
+			},
 
-		Do[used["BitSet", k], {k, VertexCount[graph]}];
+			Do[used["BitSet", k], {k, VertexCount[graph]}];
 
-		Scan[If[MemberQ[lostCenters, cent["Part", #]],
-			(dist["Part", #] = Infinity;
-			anc["Part", #] = Null;
-			cent["Part", #] = Null;
-			used["BitClear", #];)]&,
-		VertexList@graph];
-
-
-		processEdge[u_, v_] := 
-			(If[!used["BitTest", u] \[And] dist["Part", u] > dist["Part", v]
-				+ edgeWeight[graph, v\[UndirectedEdge]u],
-			(heap["Push", {-(dist["Part", v]
-				+ edgeWeight[graph, v\[UndirectedEdge]u]), u}];
-			anc["SetPart", u, v];
-			cent["SetPart", u, cent["Part", v]];
-			dist["SetPart", u, dist["Part", v]
-				+ edgeWeight[graph, v\[UndirectedEdge]u]];)]);
-
-		processEdge[u_, v_ ]/;
-			used["BitTest", u]\[And]!used["BitTest", v] :=
-			(Sow[{"swapped", u, v }, "swap"];processEdge[v, u]);
+			Scan[If[MemberQ[lostCenters, cent["Part", #]],
+				(dist["Part", #] = Infinity;
+				anc["Part", #] = Null;
+				cent["Part", #] = Null;
+				used["BitClear", #];)]&,
+			VertexList@graph];
 
 
-		Scan[
-			processEdge[Sequence@@#]&,
-		Cases[boundaryEdges, x_/;
-			Xor[used["BitTest", First[x]], used["BitTest", Last[x]]]]];
+			processEdge[u_, v_] := 
+				(If[!used["BitTest", u] \[And] dist["Part", u] > dist["Part", v]
+					+ edgeWeight[graph, v\[UndirectedEdge]u],
+				(heap["Push", {-(dist["Part", v]
+					+ edgeWeight[graph, v\[UndirectedEdge]u]), u}];
+				anc["SetPart", u, v];
+				cent["SetPart", u, cent["Part", v]];
+				dist["SetPart", u, dist["Part", v]
+					+ edgeWeight[graph, v\[UndirectedEdge]u]];)]);
 
-		While[!heap["EmptyQ"],
-			{curWeight, curVert} = heap["Pop"];
-			curWeight *= -1;
+			processEdge[u_, v_ ]/;
+				used["BitTest", u]\[And]!used["BitTest", v] :=
+				(Sow[{"swapped", u, v }, "swap"];processEdge[v, u]);
 
-			If[used["BitTest", curVert], Continue[]];
-			used["BitSet", curVert];
 
 			Scan[
-				(processEdge[#[[1]], #[[2]]];
-				If[(used["BitTest", #[[1]]]\[And]used["BitTest", #[[2]]])\[And]
-					Xor[disj["CommonSubsetQ", uDown, cent["Part", #[[1]]]],
-						disj["CommonSubsetQ", uDown, cent["Part", #[[2]]]]]\[And]
-					(bestPathWeight> edgeWeight[graph, #] + dist["Part", #[[1]]]+dist["Part", #[[1]]]),
+				processEdge[Sequence@@#]&,
+			Cases[boundaryEdges, x_/;
+				Xor[used["BitTest", First[x]], used["BitTest", Last[x]]]]];
 
-					(bestPathWeight = edgeWeight[graph, #] + dist["Part", #[[1]]]+dist["Part", #[[1]]];
-					bestPath = Join[{#}, dijkstraFindPath[#[[1]], anc], dijkstraFindPath[#[[2]], anc]])
-				];)&,
-			IncidenceList[graph, curVert]];
-		];
+			While[!heap["EmptyQ"],
+				{curWeight, curVert} = heap["Pop"];
+				curWeight *= -1;
 
-		bestPath
+				If[used["BitTest", curVert], Continue[]];
+				used["BitSet", curVert];
+
+				Scan[
+					(processEdge[#[[1]], #[[2]]];
+					If[(used["BitTest", #[[1]]]\[And]used["BitTest", #[[2]]])\[And]
+						Xor[disj["CommonSubsetQ", uDown, cent["Part", #[[1]]]],
+							disj["CommonSubsetQ", uDown, cent["Part", #[[2]]]]]\[And]
+						Nor[
+							disj["CommonSubsetQ", cent["Part", First[#]], "Forbidden"],
+							disj["CommonSubsetQ", cent["Part", Last[#]], "Forbidden"]]\[And]
+						(bestPathWeight > edgeWeight[graph, #] + dist["Part", #[[1]]]+dist["Part", #[[1]]]),
+
+						(bestPathWeight = edgeWeight[graph, #] + dist["Part", #[[1]]]+dist["Part", #[[1]]];
+						bestPath = Join[{#}, dijkstraFindPath[#[[1]], anc], dijkstraFindPath[#[[2]], anc]])
+					];)&,
+				IncidenceList[graph, curVert]];
+			];
+
+			bestPath
+		]
 	]
-]
 
 
 voronoiBoundaryPath[Null, _, _] = Null
