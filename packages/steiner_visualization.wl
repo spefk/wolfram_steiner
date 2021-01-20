@@ -25,7 +25,7 @@ voronoiVertexStyle[vertexList_, snm_List]:=
 	Composition[
 		Thread[vertexList->#]&,
 		snm/.#&,
-		Thread[#->ColorData["SunsetColors"]/@Range[0.2, 0.9, 0.7/(Length@# - 1)]]&,
+		Thread[#->(Lighter@ColorData["VisibleSpectrum"][#]&/@Range[400, 700, 300/(Length@# - 1)])]&,
 		DeleteDuplicates[snm]&
 	][]
 

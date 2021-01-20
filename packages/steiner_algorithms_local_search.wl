@@ -38,7 +38,7 @@ steinerVertexInsertion[graph_, tree_]:=
 							Sow[{solution, EdgeList[#[[1]]], "VI"}, "SolutionChange"];
 							solWeight        =  #[[2]];
 							solution         = EdgeList[#[[1]]];
-							treeVertices          =  VertexList[solution];
+							treeVertices     =  VertexList[solution];
 						]&,
 						{#,  edgeWeightSum[graph, EdgeList[#]]}&,
 						FindSpanningTree[#]&,
@@ -71,8 +71,8 @@ steinerVertexElimination[graph_, tree_, terminals_] :=
 				Composition[
 					If[ConnectedGraphQ[#[[1]]] \[And] solWeight > #[[2]],
 						Sow[{solution, EdgeList[#[[1]]], "VE"}, "SolutionChange"];
-						solWeight = #[[2]];
-						solution = EdgeList[#[[1]]];
+						solWeight    = #[[2]];
+						solution     = EdgeList[#[[1]]];
 						treeVertices = VertexList @ solution;
 					]&,
 					{#, edgeWeightSum[graph, EdgeList[#]]}&,
