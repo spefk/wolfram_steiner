@@ -3,7 +3,7 @@
 BeginPackage["Steiner`Algorithms`Exact`"];
 
 
-Needs["Steiner`Algorithms`GraphUtilities`", NotebookDirectory[]~~"\\packages\\steiner_algorithms_graph_utilities.wl"]
+Needs["Steiner`Algorithms`GraphUtilities`", "steiner_algorithms_graph_utilities.wl"]
 
 
 runDreyfusWagner::usage ="
@@ -39,7 +39,8 @@ runDreyfusWagner[graph_Graph, terminals_]:=
 						(tmpMin = (p[Union[#, {x}]] + p[Union[Complement[U, #], {x}]]);
 						If[q[Union[U, {x}], x] > tmpMin,
 							q[Union[U, {x}], x] = tmpMin;
-							qAnc[Union[U, {x}], x] = {"q", {Union[#, {x}], Union[Complement[U, #], {x}]}}])&,
+							qAnc[Union[U, {x}], x] =
+								{"q", {Union[#, {x}], Union[Complement[U, #], {x}]}}])&,
 						Subsets[U, {1, size-1}]]
 					][#]&,
 				Complement[vertList, U]]
@@ -58,10 +59,11 @@ runDreyfusWagner[graph_Graph, terminals_]:=
 							pAnc[Union[U, {x}]] = {"pp", {U, {x, #}}}])&,
 					U];
 					Scan[
-						(tmpMin = (q[Union[U, {#}], #]+ distMatrix[[x, #]]);
+						(tmpMin = (q[Union[U, {#}], #] + distMatrix[[x, #]]);
 						If[p[Union[U, {x}]] > tmpMin,
 							p[Union[U, {x}]] = tmpMin;
-						pAnc[Union[U, {x}]] = {"pq", {{Union[U, {#}], #} , {x, #}}}])&,
+							pAnc[Union[U, {x}]] =
+								{"pq", {{Union[U, {#}], #} , {x, #}}}])&,
 					Complement[vertList, U]]
 					][#]&,
 				Complement[vertList, U]]
@@ -76,6 +78,7 @@ runDreyfusWagner[graph_Graph, terminals_]:=
 			][restoredTreeDreyfusWagner[pAnc[Sort@terminals]]];
 
 		restoredTreeDreyfusWagner[{mark_, ancestor_}]:=
+			(Sow[{mark, ancestor}, "sol"];
 			Switch[mark,
 				"sp", ancestor,
 				"q" , restoredTreeDreyfusWagner[pAnc[#]]&/@ancestor,
@@ -83,18 +86,17 @@ runDreyfusWagner[graph_Graph, terminals_]:=
 						FindShortestPath[graph, Sequence@@ancestor[[2]]]},
 				"pq", {restoredTreeDreyfusWagner[qAnc[Sequence@@ancestor[[1]]]],
 						FindShortestPath[graph, Sequence@@ancestor[[2]]]}
-				];
+				]);
 
 
 		(* Base definitions for p *)
 		Scan[
-			(p[#]= distMatrix[[#[[1]], #[[2]]]];
+			(p[#] = distMatrix[[#[[1]], #[[2]]]];
 			pAnc[#] = {"sp", FindShortestPath[graph, #[[1]], #[[2]]]};)&,
 		(Sort/@Subsets[vertList, {2}])];
 
 		(* Main cycle *)
-		Scan[(runDreyfusWagnerQStep[#];runDreyfusWagnerPStep[#];)&, Range[2, tLen-1]];
-
+		Do[(runDreyfusWagnerQStep[k];runDreyfusWagnerPStep[k];), {k , 2, tLen-1}];
 
 		{p[Sort@terminals], restoredTreeDreyfusWagner[]}
 	]

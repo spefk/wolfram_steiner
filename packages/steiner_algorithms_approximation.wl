@@ -3,9 +3,9 @@
 BeginPackage["Steiner`Algorithms`Approximation`"];
 
 
-Needs["Steiner`Algorithms`GraphUtilities`", NotebookDirectory[]~~"\\packages\\steiner_algorithms_graph_utilities.wl"]
-Needs["Steiner`Utilities`", NotebookDirectory[]~~"\\packages\\steiner_utilities.wl"]
-Needs["Steiner`Algorithms`Voronoi`", NotebookDirectory[]~~"\\packages\\steiner_algorithms_voronoi.wl"]
+Needs["Steiner`Algorithms`GraphUtilities`", "steiner_algorithms_graph_utilities.wl"]
+Needs["Steiner`Utilities`", "steiner_utilities.wl"]
+Needs["Steiner`Algorithms`Voronoi`", "steiner_algorithms_voronoi.wl"]
 
 
 runKouMarkowskyBerman::usage = "

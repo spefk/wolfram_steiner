@@ -3,7 +3,7 @@
 BeginPackage["Steiner`Algorithms`Voronoi`"];
 
 
-Needs["Steiner`Algorithms`GraphUtilities`", NotebookDirectory[]~~"\\packages\\steiner_algorithms_graph_utilities.wl"]
+Needs["Steiner`Algorithms`GraphUtilities`", "steiner_algorithms_graph_utilities.wl"]
 
 
 dijkstraVoronoi::usage         = "Finds voronoi diagramm of graph. Returns: \[LeftAssociation]\"distance\" \[Rule] FixedArray[<distances>], \"ancestors\" \[Rule] FixedArray[<ancestors>], \"voronoi\" \[Rule] FixedArray[<voronoi centers>]\[RightAssociation]";

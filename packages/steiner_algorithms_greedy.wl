@@ -3,8 +3,10 @@
 BeginPackage["Steiner`Algorithms`Greedy`"];
 
 
-Needs["Steiner`Algorithms`GraphUtilities`", NotebookDirectory[]~~"\\packages\\steiner_algorithms_graph_utilities.wl"]
-Needs["Steiner`Algorithms`Dijkstra`", NotebookDirectory[]~~"\\packages\\steiner_algorithms_dijkstra.wl"]
+(*Needs["Steiner`Algorithms`GraphUtilities`", NotebookDirectory[]~~"\\packages\\steiner_algorithms_graph_utilities.wl"]
+Needs["Steiner`Algorithms`Dijkstra`", NotebookDirectory[]~~"\\packages\\steiner_algorithms_dijkstra.wl"]*)
+Needs["Steiner`Algorithms`GraphUtilities`", "steiner_algorithms_graph_utilities.wl"]
+Needs["Steiner`Algorithms`Dijkstra`", "steiner_algorithms_dijkstra.wl"]
 
 
 steinerShortestPathHeuristic::usage         = "\:0410\:043b\:0433\:043e\:0440\:0438\:0442\:043c \:043d\:0430\:0447\:0438\:043d\:0430\:0435\:0442 \:0441 \:0437\:0430\:0434\:0430\:043d\:043d\:043e\:0433\:043e \:0442\:0435\:0440\:043c\:0438\:043d\:0430\:043b\:0430, \:0438 \:0434\:043e\:0431\:0430\:0432\:043b\:044f\:0435\:0442 \:0432 \:0441\:0442\:0440\:043e\:0438\:043c\:044b\:0439 \:0433\:0440\:0430\:0444 \:0442\:0435\:043a\:0443\:0449\:0438\:0439 \:0431\:043b\:0438\:0437\:0436\:0430\:0439\:0448\:0438\:0439 \:0442\:0435\:0440\:043c\:0438\:043d\:0430\:043b (\:043e\:0442\:043d\:043e\:0441\:0438\:0442\:0435\:043b\:044c\:043d\:043e \:0432\:0441\:0435\:0445 \:0432\:0435\:0440\:0448\:0438\:043d \:0434\:0435\:0440\:0435\:0432\:0430) \:0434\:043e \:0442\:0435\:0445 \:043f\:043e\:0440, \:043f\:043e\:043a\:0430 \:043d\:0435 \:0434\:043e\:0431\:0430\:0432\:0438\:0442 \:0432\:0441\:0435 \:0442\:0435\:0440\:043c\:0438\:043d\:0430\:043b\:044b. \:0417\:0430\:0442\:0435\:043c \:0447\:0438\:0441\:0442\:0438\:0442 \:0433\:0440\:0430\:0444 \:0447\:0442\:043e\:0431\:044b \:043f\:043e\:043b\:0443\:0447\:0438\:0442\:044c \:0434\:0435\:0440\:0435\:0432\:043e.";
@@ -46,9 +48,11 @@ steinerShortestPathHeuristic[graph_, terminals_, startTerminal_,
 						{dij["distance"], dij["ancestors"]};)];
 				If[!pushed["BitTest", #],
 					(pushed["BitSet", #];	
-					Do[candidates["Push", {dist["Part", #]["Part", k], {#, k}}],
+					Do[candidates["Push", {-dist["Part", #]["Part", k], {#, k}}],
 						{k, Complement[terminals, inTree["BitList"]]}];)])&,
 			inTree["BitList"]];
+
+			If[And@@(inTree["BitTest", #]&/@terminals), Break[]];
 
 			While[!candidates["EmptyQ"],
 				curEdge = candidates["Pop"][[2]];
@@ -67,6 +71,7 @@ steinerShortestPathHeuristic[graph_, terminals_, startTerminal_,
 			curPath = dijkstraPath[curVert, anc["Part", curAnc]];
 
 			Scan[inTree["BitSet", #]&, curPath];
+			Sow[{Normal@tree, "GREEDY"}, "SolutionChange"];
 			Scan[tree["Push", #]&, UndirectedEdge@@@Partition[curPath, 2, 1]];
 			,
 		t-1];

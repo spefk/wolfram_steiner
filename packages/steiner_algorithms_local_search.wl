@@ -3,9 +3,9 @@
 BeginPackage["Steiner`Algorithms`LocalSearch`"];
 
 
-Needs["Steiner`Algorithms`GraphUtilities`", NotebookDirectory[]~~"\\packages\\steiner_algorithms_graph_utilities.wl"]
-Needs["Steiner`Algorithms`Voronoi`", NotebookDirectory[]~~"\\packages\\steiner_algorithms_graph_utilities.wl"]
-Needs["LeftistHeap`", NotebookDirectory[]~~"\\packages\\data_structures\\leftist_heap.wl"]
+Needs["Steiner`Algorithms`GraphUtilities`","steiner_algorithms_graph_utilities.wl"]
+Needs["Steiner`Algorithms`Voronoi`", "steiner_algorithms_graph_utilities.wl"]
+Needs["LeftistHeap`", "data_structures\\leftist_heap.wl"]
 
 
 steinerVertexInsertion::usage             = "Local-search. Algorithm tries to add (insert) arbitrary vertex to tree and recalculate mst. It applies all possible insertion.";

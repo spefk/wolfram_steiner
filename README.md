@@ -1,10 +1,18 @@
 ## Wolfram Mathematica steiner tree problem solving package.
 
-**Under construction.**
+**Package is under construction.**
+
+### Usage
+
+Notebook steiners_trees.nb contains exaples of package import and couple examples of usage of its functions.
+
+It is important to modify your $Path variable, addind there a path to a "packages" directory, for correct work, as it is done in .nb.
+
+### Desctiption:
 
 *Given graph G = (V, E) and set of terminals T as instance of steiner tree problem, let n = #V, m = #E, t = #T.*
 
-### Implemented algorithms:
+#### Implemented algorithms:
 Exact methods [1][2]:
 1. (DW) Dreyfus-Wagner algorithm, straight dynamic realisation O(3^t n + 2^t n^2)
 
@@ -21,8 +29,9 @@ Local-search [4]:
 2. (VE) Steiner-vertex elimination.
 3. (PE) Key-path exchange.
 
+### References
 
-[0] testing data was taken from http://steinlib.zib.de
+[0] testing data was taken from steinlib: http://steinlib.zib.de
 [1] Корте Б. Комбинаторная оптимизация. Теория и Алгоритмы / Бернард Корте, Йенс Фиген ; перевод с англ. М.А. Бабенко ; - М. : МЦНМО ; 2015 - 720 с.
 [2] Dreyfus S.  The Steiner Problem in Graphs / S. Dreyfus, R. Wagner ; 1971
 [3] Markowski G. A fast algorithm for steiner trees / G. Markowski, L. Kou, L. Berman ; 1981.

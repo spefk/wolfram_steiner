@@ -3,7 +3,7 @@
 BeginPackage["Steiner`Visualization`"];
 
 
-Needs["Steiner`Utilities`", NotebookDirectory[]~~"\\packages\\steiner_utilities.wl"]
+Needs["Steiner`Utilities`", "steiner_utilities.wl"]
 
 
 terminalVertexStyle::usage         = "Makes all terminals Red.";
@@ -25,7 +25,7 @@ voronoiVertexStyle[vertexList_, snm_List]:=
 	Composition[
 		Thread[vertexList->#]&,
 		snm/.#&,
-		Thread[#->(PadRight[Take[ColorData[35,"ColorList"], Length@#], Length@#, ColorData[35,"ColorList"]])]&,
+		Thread[#->(PadRight[Take[ColorData[35,"ColorList"], UpTo@Length@#], Length@#, ColorData[35,"ColorList"]])]&,
 		DeleteDuplicates[snm]&
 	][]
 

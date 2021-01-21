@@ -3,7 +3,7 @@
 BeginPackage["Steiner`Algorithms`Dijkstra`"];
 
 
-Needs["Steiner`Algorithms`GraphUtilities`", NotebookDirectory[]~~"\\packages\\steiner_algorithms_graph_utilities.wl"]
+Needs["Steiner`Algorithms`GraphUtilities`", "steiner_algorithms_graph_utilities.wl"]
 
 
 dijkstra::usage     = "Dijkstra's algorithm. Returns <|\"distance\"\[Rule]<FixedArray[]>, \"ancestors\"\[Rule]<FixedArray[]>|>.";

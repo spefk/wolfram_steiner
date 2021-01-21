@@ -20,9 +20,12 @@ getInstancesList[path_] := FileNames[stlibFormat, path]
 importSteinLibInstance[libPath_] :=
 	Composition[
 		{
-		Graph[Keys@First[#],
-		EdgeWeight->Values@First[#]],
-		Association@First[#], Last[#]
+		Graph[
+			Sort@VertexList@Keys@First[#],
+			Keys@First[#],
+			EdgeWeight->Values@First[#]],
+		Association@First[#],
+		Last[#]
 		}&,
 		{(Min[#1, #2]\[UndirectedEdge]Max[#1, #2]->#3)&[##]&@@@#["E"], Flatten@#["T"]}&,
 		MapAt[ToExpression, #, {All, All, All}]&,
