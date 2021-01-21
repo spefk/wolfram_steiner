@@ -1,6 +1,6 @@
 ## Wolfram Mathematica steiner tree problem solving package.
 
-**Package is under construction.**
+### **Package is under construction.**
 
 ### Usage
 
@@ -10,7 +10,10 @@ It is important to modify your $Path variable, addind there a path to a "package
 
 ### Desctiption:
 
-*Given graph G = (V, E) and set of terminals T as instance of steiner tree problem, let n = #V, m = #E, t = #T.*
+#### Steiner tree problem in graphs:
+Given graph G = (V, E) with real positive weights, and set of terminals T -- subset of V, one should find S -- a tree subgraph of G of minimal weight, containing set T.
+
+Let n = #V, m = #E, t = #T.
 
 #### Implemented algorithms:
 Exact methods [1][2]:
@@ -37,3 +40,8 @@ Local-search [4]:
 [3] Markowski G. A fast algorithm for steiner trees / G. Markowski, L. Kou, L. Berman ; 1981.
 [4] Uchoa E. Fast Local Search for Steiner Trees in Graphs / E. Uchoa, R. Werneck  ; 2010
 [5] Mehlhorn K. A Faster Approximation Algorithm for the Steiner Tree Problem in Graphs / K. Mehlhorn ; 1988
+
+
+author's contacts:
+email: f.kurmazov.b@gmail.com
+telegram: @spefk

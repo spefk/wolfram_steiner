@@ -94,9 +94,8 @@ boundaryEdges_, disj_, uDown_] :=
 				used["BitClear", #];)]&,
 			VertexList@graph];
 
-
 			processEdge[u_, v_] := 
-				(If[!used["BitTest", u] \[And] dist["Part", u] > dist["Part", v]
+				(If[!used["BitTest", u] \[And] used["BitTest", v] \[And] dist["Part", u] > dist["Part", v]
 					+ edgeWeight[graph, v\[UndirectedEdge]u],
 				(heap["Push", {-(dist["Part", v]
 					+ edgeWeight[graph, v\[UndirectedEdge]u]), u}];
@@ -106,8 +105,7 @@ boundaryEdges_, disj_, uDown_] :=
 					+ edgeWeight[graph, v\[UndirectedEdge]u]];)]);
 
 			processEdge[u_, v_ ]/;
-				used["BitTest", u]\[And]!used["BitTest", v] :=
-				(Sow[{"swapped", u, v }, "swap"];processEdge[v, u]);
+				used["BitTest", u]\[And]!used["BitTest", v] := processEdge[v, u];
 
 
 			Scan[
@@ -119,20 +117,23 @@ boundaryEdges_, disj_, uDown_] :=
 				{curWeight, curVert} = heap["Pop"];
 				curWeight *= -1;
 
-				If[used["BitTest", curVert], Continue[]];
+				If[used["BitTest", curVert],
+					Continue[]];
 				used["BitSet", curVert];
 
 				Scan[
 					(processEdge[#[[1]], #[[2]]];
-					If[(used["BitTest", #[[1]]]\[And]used["BitTest", #[[2]]])\[And]
+					If[(used["BitTest", #[[1]]] \[And] used["BitTest", #[[2]]]) \[And]
 						Xor[disj["CommonSubsetQ", uDown, cent["Part", #[[1]]]],
-							disj["CommonSubsetQ", uDown, cent["Part", #[[2]]]]]\[And]
+							disj["CommonSubsetQ", uDown, cent["Part", #[[2]]]]] \[And]
 						Nor[
 							disj["CommonSubsetQ", cent["Part", First[#]], "Forbidden"],
-							disj["CommonSubsetQ", cent["Part", Last[#]], "Forbidden"]]\[And]
-						(bestPathWeight > edgeWeight[graph, #] + dist["Part", #[[1]]]+dist["Part", #[[1]]]),
+							disj["CommonSubsetQ", cent["Part", Last[#]], "Forbidden"]] \[And]
+						(bestPathWeight > edgeWeight[graph, #] + dist["Part", #[[1]]] + dist["Part", #[[2]]]),
 
-						(bestPathWeight = edgeWeight[graph, #] + dist["Part", #[[1]]]+dist["Part", #[[1]]];
+						(Sow[{"tested", #}, "keyPath"];
+						Sow[{"path is", Join[{#}, dijkstraFindPath[#[[1]], anc], dijkstraFindPath[#[[2]], anc]]}, "keyPath"];
+						bestPathWeight = edgeWeight[graph, #] + dist["Part", #[[1]]] + dist["Part", #[[2]]];
 						bestPath = Join[{#}, dijkstraFindPath[#[[1]], anc], dijkstraFindPath[#[[2]], anc]])
 					];)&,
 				IncidenceList[graph, curVert]];

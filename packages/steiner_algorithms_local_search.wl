@@ -201,7 +201,8 @@ steinerKeyPathExchange[graph_, tree_, terminals_]:=
 					NestWhile[
 						leftistExtractMin[lheap[heapID]]&,
 						Null,
-						!MatchQ[#, Null]\[And]!downUpEdgeQ[cent["Part", First@#], cent["Part", Last@#], heapID, disj, internalPath]&,
+						!MatchQ[#, Null]\[And]!downUpEdgeQ[cent["Part", First@#], cent["Part", Last@#],
+							heapID, disj, internalPath]&,
 						{2,1}
 					];
 
@@ -238,7 +239,6 @@ steinerKeyPathExchange[graph_, tree_, terminals_]:=
 							Null];
 
 						If[!MatchQ[pathFinal, {}],
-							Sow[pathFinal, "help"];
 							pathFinal = SortBy[pathFinal, edgeWeightSum[graph, #]&][[1]];
 							If[edgeWeightSum[graph, pathFinal] < edgeWeightSum[graph, path],
 								prevSol = solution;
@@ -293,6 +293,7 @@ steinerKeyPathExchange[graph_, tree_, terminals_]:=
 					];
 
 				dfs[root];
+				Sow[Normal@disj, "keyPath"];
 				solution
 			]
 		]
