@@ -3,8 +3,6 @@
 BeginPackage["Steiner`Algorithms`Greedy`"];
 
 
-(*Needs["Steiner`Algorithms`GraphUtilities`", NotebookDirectory[]~~"\\packages\\steiner_algorithms_graph_utilities.wl"]
-Needs["Steiner`Algorithms`Dijkstra`", NotebookDirectory[]~~"\\packages\\steiner_algorithms_dijkstra.wl"]*)
 Needs["Steiner`Algorithms`GraphUtilities`", "steiner_algorithms_graph_utilities.wl"]
 Needs["Steiner`Algorithms`Dijkstra`", "steiner_algorithms_dijkstra.wl"]
 
@@ -20,7 +18,7 @@ Begin["`Private`"];
 
 
 steinerShortestPathHeuristic[graph_, terminals_, startTerminal_,
-						     distPassed_:Null, ancPassed_:Null]:=
+						     distPassed_:Null, ancPassed_:Null] :=
 	Module[
 		{n = VertexCount@graph, t = Length@terminals,
 		dist, anc, tree, inTree, candidates, curEdge,
@@ -56,11 +54,12 @@ steinerShortestPathHeuristic[graph_, terminals_, startTerminal_,
 
 			While[!candidates["EmptyQ"],
 				curEdge = candidates["Pop"][[2]];
-				If[Xor[inTree["BitTest", First[curEdge]], inTree["BitTest", Last[curEdge]]],
+				If[Xor[
+					inTree["BitTest", First[curEdge]],
+					inTree["BitTest", Last[curEdge]]
+					],
 					Break[]]
 			];
-
-			If[candidates["EmptyQ"], Break[]];
 
 			If[inTree["BitTest", First[curEdge]],
 				curVert  = Last[curEdge];
@@ -75,8 +74,12 @@ steinerShortestPathHeuristic[graph_, terminals_, startTerminal_,
 			Scan[tree["Push", #]&, UndirectedEdge@@@Partition[curPath, 2, 1]];
 			,
 		t-1];
+
+		Sow[{Normal@tree, "GREEDY"}, "SolutionChange"];
 		
-		Composition[
+		Normal@tree
+		
+		(*Composition[
 			FixedPoint[
 				DeleteCases[#, x_/;
 					(FreeQ[terminals, x[[1]]]\[And]vertexDegree[x[[1]],#]==1)
@@ -86,14 +89,14 @@ steinerShortestPathHeuristic[graph_, terminals_, startTerminal_,
 			EdgeList@FindSpanningTree[#]&,
 			Subgraph[graph, #]&,
 			DeleteDuplicates[#, SameTest->(ContainsExactly[List@@#1, List@@#2]&)]&
-		][Normal@tree]
+		][Normal@tree]*)
 	]
 
 
 (* RSPH *)
 
 
-steinerRepeatedShortestPathHeuristic[graph_, terminals_, it_:100]:=
+steinerRepeatedShortestPathHeuristic[graph_, terminals_, it_:100] :=
 	Module[{dist, anc},
 		dist = CreateDataStructure["FixedArray", VertexCount@graph];
 		anc  = CreateDataStructure["FixedArray", VertexCount@graph];

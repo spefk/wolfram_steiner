@@ -32,7 +32,7 @@ Begin["`Private`"];
 (* 2-approximation (Kou \[Dash] Markowsky \[Dash] Berman) *)
 
 
-getMetricClosureOfGraphTerminalsTedges[graph_, terminals_, t_]:=
+getMetricClosureOfGraphTerminalsTedges[graph_, terminals_, t_] :=
 	Composition[
 		Function[weights,
 			(UndirectedEdge[t, #]->weights[[#]])&/@terminals
@@ -41,7 +41,7 @@ getMetricClosureOfGraphTerminalsTedges[graph_, terminals_, t_]:=
 		][t]
 
 
-getMetricClosureOfGraphTerminals[graph_Graph, terminals_List]:=
+getMetricClosureOfGraphTerminals[graph_Graph, terminals_List] :=
 	Composition[
 		Graph[Keys@#, EdgeWeight->Values@#]&,
 		DeleteDuplicates[#]&,
@@ -50,7 +50,7 @@ getMetricClosureOfGraphTerminals[graph_Graph, terminals_List]:=
 	][terminals]
 
 
-runKouMarkowskyBerman[graph_Graph, terminals_]:=
+runKouMarkowskyBerman[graph_Graph, terminals_] :=
 	Module[{minSpanningTreeEdges},
 
 		minSpanningTreeEdges=
@@ -83,10 +83,10 @@ runKouMarkowskyBerman[graph_Graph, terminals_]:=
 (* 2-approximation (Mehlhorn) *)
 
 
-deleteBranches[tree_, terminals_]:=
+deleteBranches[tree_, terminals_] :=
 Block[{dfsBranches, used},
 
-	dfsBranches[vert_, prev_:Null]:=
+	dfsBranches[vert_, prev_:Null] :=
 		Module[{successors = Complement[AdjacencyList[tree, vert], {prev}], f},
 			If[MatchQ[successors, {}],
 				If[FreeQ[terminals, vert], Sow[vert];True],
@@ -103,7 +103,7 @@ Block[{dfsBranches, used},
 	]
 
 
-runMehlhorn[graph_, terminals_]:=
+runMehlhorn[graph_, terminals_] :=
 	Module[{dijVoronoi, vor, sp, auxilaryEdgeWeights},
 
 		dijVoronoi = dijkstraVoronoi[graph, terminals];

@@ -6,6 +6,7 @@ BeginPackage["Steiner`SteinLib`"];
 getInstancesList::usage           = "Gives list of paths to all .stp files in <path>.";
 importSteinLibInstance::usage     = "Reads .stp file at <libPath> and returns {Graph[], List[ edge->weight], List[ terminals ]}.";
 importSteinLibInstanceList::usage = "TEST Returns an imported steiner problem instance for each path.";
+importInfoTable::usage            = "Imports steinlib info-table as associtaion.";
 
 
 Begin["`Private`"];
@@ -38,6 +39,16 @@ importSteinLibInstance[libPath_] :=
 
 
 importSteinLibInstanceList[pathList:{__String}] := importSteinLibInstance[#]&/@pathList
+
+
+importInfoTable[path_] :=
+Composition[
+Map[Quiet@ToExpression@#&, #, {2}]&,
+Function[info,
+AssociationThread[Rest@First[info], #]&/@
+Association[StringTrim[First[#]]->Rest[#]&/@Rest[info]]][#]&,
+ Import[#, "Data"][[1]]&
+][path]
 
 
 End[];

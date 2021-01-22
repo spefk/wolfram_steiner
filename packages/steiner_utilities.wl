@@ -13,7 +13,7 @@ Begin["`Private`"];
 
 SetAttributes[clearAndProtect, {HoldAll, Listable}]
 
-clearAndProtect[what_Symbol]:=
+clearAndProtect[what_Symbol] :=
 	(Unprotect[what];
 	ClearAll[what];
 	Protect[what];)

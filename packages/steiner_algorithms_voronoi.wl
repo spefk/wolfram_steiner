@@ -16,7 +16,7 @@ repairVoronoi::usage           = "Used in Key-path Exchange. Recalculates vorono
 Begin["`Private`"];
 
 
-dijkstraVoronoi[graph_Graph, terminals_]:=
+dijkstraVoronoi[graph_Graph, terminals_] :=
 	Module[
 		{
 			spValue            =   CreateDataStructure["FixedArray", Infinity, VertexCount[graph]],

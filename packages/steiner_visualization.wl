@@ -18,10 +18,10 @@ drawGraphSubgraphDifference::usage = "";
 Begin["`Private`"];
 
 
-terminalVertexStyle[terminals_]:=(#->{Red}&/@terminals)
+terminalVertexStyle[terminals_] := (#->{Red}&/@terminals)
 
 
-voronoiVertexStyle[vertexList_, snm_List]:=
+voronoiVertexStyle[vertexList_, snm_List] :=
 	Composition[
 		Thread[vertexList->#]&,
 		snm/.#&,
@@ -44,23 +44,23 @@ drawGraph[graph_Graph, terminals_, opts:OptionsPattern[]] :=
 		VertexLabelStyle -> Directive[Black, 10],
 		EdgeLabels -> Placed["EdgeWeight", Tooltip],
 		ImageSize -> 300}
-		]
+	]
 
 
 Options[drawGraphSubgraph] = Join[Options[Graph], {VertexStyleFunc -> {}, TerminalSize->0.5, TerminalShape->"Square"}];
 
-drawGraphSubgraph[graph_Graph, subgraphEdges_, terminalVertices_,  opts:OptionsPattern[]]:= 
+drawGraphSubgraph[graph_Graph, subgraphEdges_, terminalVertices_,  opts:OptionsPattern[]] := 
 	drawGraph[
 		graph,
 		terminalVertices,
 		EdgeStyle->(#->{Orange, Thickness[0.015]}&/@subgraphEdges),
 		FilterRules[{opts}, Options[drawGraph]]
-		]
+	]
 
 
 Options[drawGraphSubgraphDifference] = Join[Options[Graph], {VertexStyleFunc -> {}, TerminalSize->0.5, TerminalShape->"Square"}];
 
-drawGraphSubgraphDifference[graph_Graph, subgraphEdges_, subgraphEdgesOld_, terminalVertices_,  opts:OptionsPattern[]]:= 
+drawGraphSubgraphDifference[graph_Graph, subgraphEdges_, subgraphEdgesOld_, terminalVertices_,  opts:OptionsPattern[]] := 
 	drawGraph[
 		graph,
 		terminalVertices,
@@ -88,7 +88,7 @@ gridResult[graph_Graph, terminals_, tree_, treeWeight_, opts:OptionsPattern[]] :
 
 Options[gridResultCompare] = Join[Options[Graph], {VertexStyleFunc -> {}, TerminalSize->0.5, TerminalShape->"Square"}];
 
-gridResultCompare[graph_Graph,  terminals_, tree_, treeOld_, treeWeight_, opts:OptionsPattern[]]:=
+gridResultCompare[graph_Graph,  terminals_, tree_, treeOld_, treeWeight_, opts:OptionsPattern[]] :=
 	Grid[
 		{
 			{"Graph", "Tree" , "Tree weight"},

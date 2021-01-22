@@ -23,7 +23,7 @@ leftistHeapDraw::usage              =    "Visualises Leftist Heap as graph.";
 Begin["`Private`"];
 
 
-leftistHeapQ[heap_]:= MatchQ[heap, {_, _, _Integer, _List, _List}]
+leftistHeapQ[heap_] := MatchQ[heap, {_, _, _Integer, _List, _List}]
 
 
 (*({priority, element, closest leaf distance, left child, right child})*)
@@ -50,23 +50,23 @@ leftistHeapMeld[x_, y_, z__List] := Fold[leftistHeapMeld, x, {y, z}]
 
 
 SetAttributes[leftistHeapMeldClearly, HoldAll]
-leftistHeapMeldClearly[new_, x_, y_]:=
+leftistHeapMeldClearly[new_, x_, y_] :=
 	(Unevaluated[new]=leftistHeapMeld[x, y];
 	Unevaluated[x]=.;
 	Unevaluated[y]=.;)
 
-leftistHeapMeldClearly[x_, y_]:=
+leftistHeapMeldClearly[x_, y_] :=
 	(Unevaluated[x]=leftistHeapMeld[x, y];
 	Unevaluated[y]=.;)
 
 SetAttributes[leftistHeapMeldClearlyList, HoldAllComplete]
-leftistHeapMeldClearlyList[new_, x__]:=
+leftistHeapMeldClearlyList[new_, x__] :=
 	(Unevaluated[new]=leftistHeapCreate[];
 	Scan[leftistHeapMeldClearly[Unevaluated@new, Unevaluated@#]&,
 	ReleaseHold@Map[Unevaluated, {Hold@x}, {2}]];)
 
 
-leftistHeapHeapify[toAdd:{__List}]:=
+leftistHeapHeapify[toAdd:{__List}] :=
 	Block[{$RecursionLimit=Infinity},
 		leftistHeapHeapifyStep[toAdd]
 	]

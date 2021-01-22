@@ -14,7 +14,7 @@ Output: {weight of optimal steiner tree, optimal steiner tree}.";
 Begin["`Private`"];
 
 
-runDreyfusWagner[graph_Graph, terminals_]:=
+runDreyfusWagner[graph_Graph, terminals_] :=
 	Block[
 		{vertList  = VertexList@graph,
 		edgeList   = EdgeList@graph,
@@ -31,7 +31,7 @@ runDreyfusWagner[graph_Graph, terminals_]:=
 
 
 		(* Internal cycle for q values *)
-		runDreyfusWagnerQStep[size_]:=
+		runDreyfusWagnerQStep[size_] :=
 			Scan[Function[U,
 				Scan[Function[x,
 					q[Union[U, {x}], x] = Infinity;
@@ -48,7 +48,7 @@ runDreyfusWagner[graph_Graph, terminals_]:=
 			Sort/@Subsets[terminals, {size}]];
 
 		(* Internal cycle for p values *)
-		runDreyfusWagnerPStep[size_]:=
+		runDreyfusWagnerPStep[size_] :=
 			Scan[Function[U,
 				Scan[Function[x,
 					p[Union[U, {x}]] = Infinity;
@@ -70,14 +70,14 @@ runDreyfusWagner[graph_Graph, terminals_]:=
 				][#]&,
 			Sort/@Subsets[terminals, {size}]];
 
-		restoredTreeDreyfusWagner[]:=
+		restoredTreeDreyfusWagner[] :=
 			Composition[
 				DeleteDuplicates[#, ContainsExactly[#1==#2]&]&,
 				Flatten@#&,
 				Map[UndirectedEdge@@@Partition[#, 2, 1]&, #,{-2}]&
 			][restoredTreeDreyfusWagner[pAnc[Sort@terminals]]];
 
-		restoredTreeDreyfusWagner[{mark_, ancestor_}]:=
+		restoredTreeDreyfusWagner[{mark_, ancestor_}] :=
 			(Sow[{mark, ancestor}, "sol"];
 			Switch[mark,
 				"sp", ancestor,

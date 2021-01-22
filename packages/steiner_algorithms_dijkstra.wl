@@ -13,7 +13,7 @@ dijkstraPath::usage = "Retrieve vertex path to vertex according to ancestors <Fi
 Begin["`Private`"];
 
 
-dijkstra[graph_, start_]:=
+dijkstra[graph_, start_] :=
 	Module[{n = VertexCount@graph, curVert, curWeight, queue, anc, dist, used},
 		queue          = CreateDataStructure["PriorityQueue"];
 		anc            = CreateDataStructure["FixedArray", n];

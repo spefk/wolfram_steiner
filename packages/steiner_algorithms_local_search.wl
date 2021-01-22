@@ -26,13 +26,13 @@ Begin["`Private`"];
 (* Steiner vertex insertion *)
 
 
-steinerVertexInsertion[graph_, tree_]:=
+steinerVertexInsertion[graph_, tree_] :=
 	Block[{tryAddVertex},
 		With[{graphVertices = VertexList@graph},
 			Module[{treeVertices = VertexList@tree,
 				solWeight, solution = tree},
 
-				tryAddVertex[v_]:=
+				tryAddVertex[v_] :=
 					Composition[
 						If[ConnectedGraphQ[#[[1]]]\[And]solWeight > #[[2]], 
 							Sow[{solution, EdgeList[#[[1]]], "VI"}, "SolutionChange"];
@@ -55,7 +55,8 @@ steinerVertexInsertion[graph_, tree_]:=
 		]
 	]
 
-steinerVertexInsertionFixedPoint[graph_, tree_, maxSteps_:Infinity]:=FixedPoint[steinerVertexInsertion[graph, #]&, tree, maxSteps]
+steinerVertexInsertionFixedPoint[graph_, tree_, maxSteps_:Infinity] :=
+	FixedPoint[steinerVertexInsertion[graph, #]&, tree, maxSteps]
 
 
 
@@ -87,7 +88,8 @@ steinerVertexElimination[graph_, tree_, terminals_] :=
 		]
 	]
 
-steinerVertexEliminationFixedPoint[graph_, tree_, terminals_, maxSteps_:Infinity] := FixedPoint[steinerVertexElimination[graph, #, terminals]&, tree, maxSteps]
+steinerVertexEliminationFixedPoint[graph_, tree_, terminals_, maxSteps_:Infinity] :=
+	FixedPoint[steinerVertexElimination[graph, #, terminals]&, tree, maxSteps]
 
 
 (* Steiner vertex elimination and steiner vertex insertion *)
@@ -109,7 +111,7 @@ steinerVIVEFixedPoint[graph_, tree_, terminals_, maxStep_:Infinity] :=
 crucialQ[v_, tree_, terminals_] := MemberQ[terminals, v]\[Or](VertexDegree[tree, v]>=3)
 
 
-rootTreeKeyPath[tree_, graphVertexNumber_, terminals_]:=
+rootTreeKeyPath[tree_, graphVertexNumber_, terminals_] :=
 	Module[{root, depth, parent, children},
 		root        = FirstCase[VertexList@tree, x_/;crucialQ[x, tree, terminals]];
 		depth       = CreateDataStructure["FixedArray", graphVertexNumber];
@@ -130,7 +132,7 @@ rootTreeKeyPath[tree_, graphVertexNumber_, terminals_]:=
 
 
 
-steinerKeyPathExchange[graph_, tree_, terminals_]:=
+steinerKeyPathExchange[graph_, tree_, terminals_] :=
 	Block[{lheap, dfs, tryEliminatePath,
 		extractMinUntill, downUpEdgeQ, currentInternalKeyPath},
 		currentInternalKeyPath = CreateDataStructure["Stack"];
@@ -187,7 +189,7 @@ steinerKeyPathExchange[graph_, tree_, terminals_]:=
 				Scan[disj["Insert", #]&, treeVertices];
 				disj["Insert", "Forbidden"];
 
-				downUpEdgeQ[v_, u_, down_, disj_, internalPath_]:=
+				downUpEdgeQ[v_, u_, down_, disj_, internalPath_] :=
 					And[
 						Xor[disj["CommonSubsetQ", cent["Part", v], down],
 							disj["CommonSubsetQ", cent["Part", u], down]],
@@ -197,7 +199,7 @@ steinerKeyPathExchange[graph_, tree_, terminals_]:=
 							disj["CommonSubsetQ", cent["Part", u], "Forbidden"]]
 					];
 
-				extractMinUntill[heapID_, internalPath_]:=
+				extractMinUntill[heapID_, internalPath_] :=
 					NestWhile[
 						leftistExtractMin[lheap[heapID]]&,
 						Null,
@@ -206,7 +208,7 @@ steinerKeyPathExchange[graph_, tree_, terminals_]:=
 						{2,1}
 					];
 
-				tryEliminatePath[pathStack_, u_, v_]:=
+				tryEliminatePath[pathStack_, u_, v_] :=
 					Module[
 						{
 							edgeBase, brokenTree,
@@ -251,7 +253,7 @@ steinerKeyPathExchange[graph_, tree_, terminals_]:=
 						];
 					];
 
-				dfs[v_]:=
+				dfs[v_] :=
 					Module[
 						{successors, prevCrus, path},
 
@@ -304,7 +306,7 @@ steinerKeyPathExchangeFixedPoint[graph_, tree_, terminals_] :=
 	FixedPoint[steinerKeyPathExchange[graph, #, terminals]&, tree]
 
 
-steinerPEVIVE[graph_, tree_, terminals_]:=
+steinerPEVIVE[graph_, tree_, terminals_] :=
 	Composition[
 		steinerVertexElimination[graph, #, terminals]&,
 		steinerVertexInsertion[graph, #]&,

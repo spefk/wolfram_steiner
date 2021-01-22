@@ -17,7 +17,7 @@ Begin["`Private`"];
 
 Options[generateSteinerProblemInstanceRG] = {WeightBounds ->{1, 100}};
 
-generateSteinerProblemInstanceRG[n_:10, m_:15, t_:3, opts:OptionsPattern[]]:=
+generateSteinerProblemInstanceRG[n_:10, m_:15, t_:3, opts:OptionsPattern[]] :=
 	Module[{graph, weightAssociation},
 
 		While[
@@ -37,7 +37,7 @@ generateSteinerProblemInstanceRG[n_:10, m_:15, t_:3, opts:OptionsPattern[]]:=
 
 Options[generateSteinerProblemInstance] = {BernoulliProbability -> 0.15, WeightBounds ->{1, 100}};
 
-generateSteinerProblemInstance[n_:10, t_:3, opts:OptionsPattern[]]:=
+generateSteinerProblemInstance[n_:10, t_:3, opts:OptionsPattern[]] :=
 	Module[{graph, weightAssociation},
 
 		While[
@@ -55,7 +55,7 @@ generateSteinerProblemInstance[n_:10, t_:3, opts:OptionsPattern[]]:=
 	]
 
 
-generate2DSteinerProblemInstance[n_:15, t_:3]:=
+generate2DSteinerProblemInstance[n_:15, t_:3] :=
 	Module[{out = {}},
 
 		While[True, 
@@ -78,7 +78,7 @@ generate2DSteinerProblemInstanceStep[n_:15, t_:3] :=
 	]
 
 
-generateSteinerProblemInstanceGrid[r_, c_, t_]:=
+generateSteinerProblemInstanceGrid[r_, c_, t_] :=
 	Module[{graph, weightAssociation},
 
 		graph =  GridGraph[{r, c}];
