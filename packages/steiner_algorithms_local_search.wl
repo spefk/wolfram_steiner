@@ -3,9 +3,9 @@
 BeginPackage["Steiner`Algorithms`LocalSearch`"];
 
 
-Needs["Steiner`Algorithms`GraphUtilities`", NotebookDirectory[]~~"\\packages\\steiner_algorithms_graph_utilities.wl"]
-Needs["Steiner`Algorithms`Voronoi`", NotebookDirectory[]~~"\\packages\\steiner_algorithms_graph_utilities.wl"]
-Needs["LeftistHeap`", NotebookDirectory[]~~"\\packages\\data_structures\\leftist_heap.wl"]
+Needs["Steiner`Algorithms`GraphUtilities`","steiner_algorithms_graph_utilities.wl"]
+Needs["Steiner`Algorithms`Voronoi`", "steiner_algorithms_graph_utilities.wl"]
+Needs["LeftistHeap`", "data_structures\\leftist_heap.wl"]
 
 
 steinerVertexInsertion::usage             = "Local-search. Algorithm tries to add (insert) arbitrary vertex to tree and recalculate mst. It applies all possible insertion.";
@@ -26,262 +26,297 @@ Begin["`Private`"];
 (* Steiner vertex insertion *)
 
 
-(* ::Input::Initialization::Plain:: *)
-ClearAll[steinerVertexInsertion, steinerVertexInsertionFixedPoint]
+steinerVertexInsertion[graph_, tree_] :=
+	Block[{tryAddVertex},
+		With[{graphVertices = VertexList@graph},
+			Module[{treeVertices = VertexList@tree,
+				solWeight, solution = tree},
 
-steinerVertexInsertion[graph_, tree_]:=
-Block[{tryAddVertex},
-With[{graphVertices = VertexList@graph},
-Module[{treeVertices = VertexList@tree,
-solWeight, solution = tree},
+				tryAddVertex[v_] :=
+					Composition[
+						If[ConnectedGraphQ[#[[1]]]\[And]solWeight > #[[2]], 
+							Sow[{solution, EdgeList[#[[1]]], "VI"}, "SolutionChange"];
+							solWeight        =  #[[2]];
+							solution         = EdgeList[#[[1]]];
+							treeVertices     =  VertexList[solution];
+						]&,
+						{#,  edgeWeightSum[graph, EdgeList[#]]}&,
+						FindSpanningTree[#]&,
+						Subgraph[graph, Union[treeVertices, {#}]]&
+					][v];
 
-tryAddVertex[v_]:=
-Composition[
-If[ConnectedGraphQ[#[[1]]]\[And]solWeight > #[[2]], 
-solWeight        = #[[2]];
-solution         = EdgeList[#[[1]]];
-treeVertices =  VertexList[solution];]&,
-{#,  edgeWeightSum[graph, EdgeList[#]]}&,
-FindSpanningTree[#]&,
-Subgraph[graph, Union[treeVertices, {#}]]&
-][v];
+				solWeight = edgeWeightSum[graph, EdgeList[tree]];
 
-solWeight = edgeWeightSum[graph, EdgeList[tree]];
+				Scan[tryAddVertex[#]&, Complement[graphVertices, treeVertices]];
 
-Scan[tryAddVertex[#]&, Complement[graphVertices, treeVertices]];
+				solution
 
-solution
+			]
+		]
+	]
 
-]
-]
-]
-
-steinerVertexInsertionFixedPoint[graph_, tree_, maxSteps_:Infinity]:=FixedPoint[steinerVertexInsertion[graph, #]&, tree, maxSteps]
+steinerVertexInsertionFixedPoint[graph_, tree_, maxSteps_:Infinity] :=
+	FixedPoint[steinerVertexInsertion[graph, #]&, tree, maxSteps]
 
 
 
 (* Steiner vertex elimination *)
 
 
-(* ::Input::Initialization::Plain:: *)
-ClearAll[steinerVertexElimination, steinerVertexEliminationFixedPoint]
-
 steinerVertexElimination[graph_, tree_, terminals_] :=
-Block[{tryEliminateVertex},
-Module[{treeVertices = VertexList@tree, solution=tree, solWeight},
-solWeight = edgeWeightSum[graph, EdgeList[tree]];
+	Block[{tryEliminateVertex},
+		Module[{treeVertices = VertexList@tree, solution=tree, solWeight},
+			solWeight = edgeWeightSum[graph, EdgeList[tree]];
 
-tryEliminateVertex[v_] :=
-Composition[
-If[ConnectedGraphQ[#[[1]]] \[And] solWeight > #[[2]],
-solWeight = #[[2]];
-solution = EdgeList[#[[1]]];
-treeVertices = VertexList @ solution;]&,
-{#, edgeWeightSum[graph, EdgeList[#]]}&,
-FindSpanningTree[#]&,
-Subgraph[graph, Complement[treeVertices, {#}]]&][v];
+			tryEliminateVertex[v_] :=
+				Composition[
+					If[ConnectedGraphQ[#[[1]]] \[And] solWeight > #[[2]],
+						Sow[{solution, EdgeList[#[[1]]], "VE"}, "SolutionChange"];
+						solWeight    = #[[2]];
+						solution     = EdgeList[#[[1]]];
+						treeVertices = VertexList @ solution;
+					]&,
+					{#, edgeWeightSum[graph, EdgeList[#]]}&,
+					FindSpanningTree[#]&,
+					Subgraph[graph, Complement[treeVertices, {#}]]&
+				][v];
 
-Scan[tryEliminateVertex[#]&,
-Complement[treeVertices, terminals]];
+			Scan[tryEliminateVertex[#]&,
+			Complement[treeVertices, terminals]];
 
-solution
-]
-]
+			solution
+		]
+	]
 
-steinerVertexEliminationFixedPoint[graph_, tree_, terminals_, maxSteps_:Infinity] := FixedPoint[steinerVertexElimination[graph, #, terminals]&, tree, maxSteps]
+steinerVertexEliminationFixedPoint[graph_, tree_, terminals_, maxSteps_:Infinity] :=
+	FixedPoint[steinerVertexElimination[graph, #, terminals]&, tree, maxSteps]
 
 
 (* Steiner vertex elimination and steiner vertex insertion *)
 
 
-ClearAll[steinerVIVE, steinerVIVEFixedPoint]
-
 steinerVIVE[graph_, tree_, terminals_] :=
-Composition[
-steinerVertexElimination[graph, #, terminals]&,
-steinerVertexInsertion[graph, #]&
-][tree]
+	Composition[
+		steinerVertexElimination[graph, #, terminals]&,
+		steinerVertexInsertion[graph, #]&
+	][tree]
 
-steinerVIVEFixedPoint[graph_, tree_, terminals_, maxStep_:Infinity]:= FixedPoint[steinerVIVE[graph, #, terminals]&, tree, maxStep]
+steinerVIVEFixedPoint[graph_, tree_, terminals_, maxStep_:Infinity] :=
+	FixedPoint[steinerVIVE[graph, #, terminals]&, tree, maxStep]
 
 
 (* Key-path Exchange *)
 
 
-(* ::Input::Initialization::Plain:: *)
-ClearAll[crucialQ]
-
-crucialQ[v_, tree_, terminals_]:=MemberQ[terminals, v]\[Or](VertexDegree[tree, v]>=3)
+crucialQ[v_, tree_, terminals_] := MemberQ[terminals, v]\[Or](VertexDegree[tree, v]>=3)
 
 
-(* ::Input::Initialization::Plain:: *)
-ClearAll[rootTreeKeyPath]
+rootTreeKeyPath[tree_, graphVertexNumber_, terminals_] :=
+	Module[{root, depth, parent, children},
+		root        = FirstCase[VertexList@tree, x_/;crucialQ[x, tree, terminals]];
+		depth       = CreateDataStructure["FixedArray", graphVertexNumber];
+		parent      = CreateDataStructure["FixedArray", graphVertexNumber];
+		children    = CreateDataStructure["FixedArray", graphVertexNumber];
+		
+		Scan[children["SetPart", #, CreateDataStructure["Stack"]]&, VertexList@tree];
 
-rootTreeKeyPath[tree_, graphVertexNumber_, terminals_]:=
-Module[{root, depth, parent, children},
-root        = FirstCase[VertexList@tree, x_/;crucialQ[x, tree, terminals]];
-depth       = CreateDataStructure["FixedArray", graphVertexNumber];
-parent      = CreateDataStructure["FixedArray", graphVertexNumber];
-children    = CreateDataStructure["FixedArray", graphVertexNumber];
-Scan[children["SetPart", #, CreateDataStructure["Stack"]]&, VertexList@tree];
-DepthFirstScan[EdgeList@tree, root,
-{"DiscoverVertex"->
-((depth["SetPart", #1, #3];
-If[#2!=#1, children["Part", #2]["Push", #1]];
-parent["SetPart", #1, #2];)&)}];
+		DepthFirstScan[EdgeList@tree, root,
+			{"DiscoverVertex"->
+			((depth["SetPart", #1, #3];
+			If[#2!=#1, children["Part", #2]["Push", #1]];
+			parent["SetPart", #1, #2];)&)}
+		];
 
-{root, depth, parent, children}]
+		{root, depth, parent, children}
+	]
 
 
 
-(* ::Input::Initialization::Plain:: *)
-ClearAll[steinerKeyPathExchange]
+steinerKeyPathExchange[graph_, tree_, terminals_] :=
+	Block[{lheap, dfs, tryEliminatePath,
+		extractMinUntill, downUpEdgeQ, currentInternalKeyPath},
+		currentInternalKeyPath = CreateDataStructure["Stack"];
+		With[
+			{
+				treeVertexNumber  = VertexCount@tree,
+				graphVertexNumber = VertexCount@graph,
+				treeEdges         = EdgeList@tree,
+				graphEdges        = EdgeList@graph,
+				graphVertices     = VertexList@graph,
+				treeVertices      = VertexList@tree
+			},
+			Module[
+				{voronoi, dist, anc, cent, heapArray, solution,
+				root, depth, parent, children, graphTreeEdges, disj,
+				baseBoundaryEdges, eliminatedPath, boundaryEdges, toHeapify},
 
-steinerKeyPathExchange[graph_, tree_, terminals_]:=
-Block[{lheap, dfs, tryEliminatePath,
-extractMinUntill,downUpEdgeQ,currentInternalKeyPath},
-currentInternalKeyPath = CreateDataStructure["Stack"];
-With[{treeVertexNumber = VertexCount@tree, graphVertexNumber=VertexCount@graph,
-treeEdges = EdgeList@tree, graphEdges = EdgeList@graph, graphVertices = VertexList@graph, treeVertices = VertexList@tree},
-Module[{voronoi, dist, anc, cent, heapArray, solution,
-root, depth, parent, children,graphTreeEdges, disj,time,
-baseBoundaryEdges, eliminatedPath, boundaryEdges},
+				solution       = treeEdges;
+				graphTreeEdges = EdgeList@Subgraph[graph, treeVertices];
 
-solution = treeEdges;
-graphTreeEdges = EdgeList@Subgraph[graph, treeVertices];
+				(* voronoi *)
+				voronoi = dijkstraVoronoi[graph, treeVertices];
+				anc     = voronoi["ancestors"];
+				dist    = voronoi["distance"];
+				cent    = voronoi["voronoi"];
 
-(* voronoi *)
-voronoi = dijkstraVoronoi[graph, treeVertices];
-anc = voronoi["ancestors"];
-dist = voronoi["distance"];
-cent = voronoi["voronoi"];
+				(* boundary edges push to heaps and stacks *)
+				baseBoundaryEdges = Select[graphEdges, cent["Part", First[#]] != cent["Part", Last[#]]&];
 
-(* boundary edges push to heaps and stacks *)
-baseBoundaryEdges = Select[graphEdges, cent["Part", First[#]] != cent["Part", Last[#]]&];
+				boundaryEdges = CreateDataStructure["FixedArray", graphVertexNumber];
+				Scan[boundaryEdges["SetPart", #, CreateDataStructure["Stack"]]&, treeVertices];
 
-boundaryEdges = CreateDataStructure["FixedArray", graphVertexNumber];
-Scan[boundaryEdges["SetPart", #, CreateDataStructure["Stack"]]&, treeVertices];
+				(* Push is costly for current implementation of leftist heap. *)
+				(* It is better now (and in general) to firstly create arrays of elements, and then heapify them (because push just melds old heap with new heap of size 1), if it is possible. *)
+				toHeapify = CreateDataStructure["FixedArray", graphVertexNumber];
+				Scan[toHeapify["SetPart", #, CreateDataStructure["Stack"]]&, treeVertices];
 
-Scan[(lheap[#]=leftistHeapCreate[])&, treeVertices];
-Scan[
-(leftistHeapPush[lheap[cent["Part", First[#]]], {#, dist["Part", First[#]] + dist["Part", Last[#]] + edgeWeight[graph, #]}];
-leftistHeapPush[lheap[cent["Part", Last[#]]], {#, dist["Part", First[#]] + dist["Part", Last[#]] + edgeWeight[graph, #]}];boundaryEdges["Part", cent["Part", First[#]]]["Push", #];boundaryEdges["Part", cent["Part", Last[#]]]["Push", #];)&,
-baseBoundaryEdges];
+				Scan[
+					(toHeapify["Part", cent["Part", First[#]]]["Push", {#, dist["Part", First[#]]
+						+ dist["Part", Last[#]] + edgeWeight[graph, #]}];
+					toHeapify["Part", cent["Part", Last[#]]]["Push", {#, dist["Part", First[#]]
+						+ dist["Part", Last[#]] + edgeWeight[graph, #]}];
+					boundaryEdges["Part", cent["Part", First[#]]]["Push", #];
+					boundaryEdges["Part", cent["Part", Last[#]]]["Push", #];)&,
+				baseBoundaryEdges];
 
-(* tree rooting *)
-{root, depth, parent, children} = rootTreeKeyPath[tree, graphVertexNumber, terminals];
+				Scan[(lheap[#]=leftistHeapHeapify[Normal@toHeapify["Part", #]])&, treeVertices];
 
-disj = CreateDataStructure["DisjointSet"];
-Scan[disj["Insert", #]&, treeVertices];
+				(* Tree rooting *)
+				{root, depth, parent, children} = rootTreeKeyPath[tree, graphVertexNumber, terminals];
 
-downUpEdgeQ[v_, u_, down_, disj_]:=
-And[Xor[disj["CommonSubsetQ", cent["Part", v], down], disj["CommonSubsetQ", cent["Part", u], down]],
-And[FreeQ[Normal@currentInternalKeyPath, cent["Part", v]], FreeQ[Normal@currentInternalKeyPath, cent["Part", u]]]];
+				(* To keep all vertices of processed sub-tree in one set. *)
+				disj = CreateDataStructure["DisjointSet"];
+				Scan[disj["Insert", #]&, treeVertices];
+				disj["Insert", "Forbidden"];
 
-extractMinUntill[heapID_]:=
-NestWhile[
-leftistExtractMin[lheap[heapID]]&,
-Null,
-!MatchQ[#, Null]\[And]!downUpEdgeQ[cent["Part", First@#], cent["Part", Last@#], heapID, disj]&,
-{2,1}];
+				downUpEdgeQ[v_, u_, down_, disj_, internalPath_] :=
+					And[
+						Xor[disj["CommonSubsetQ", cent["Part", v], down],
+							disj["CommonSubsetQ", cent["Part", u], down]],
+						And[FreeQ[internalPath, cent["Part", v]],
+							FreeQ[internalPath, cent["Part", u]]],
+						Nor[disj["CommonSubsetQ", cent["Part", v], "Forbidden"],
+							disj["CommonSubsetQ", cent["Part", u], "Forbidden"]]
+					];
 
-tryEliminatePath[path_, u_, v_]:=
-Module[{edgeBase, brokenTree, tabuVertices,
-baseBit, bottomTree, upperTree, deletedZones, curBoundaryEdges, paths,
-currentInternalKeyPathNormal = Normal@currentInternalKeyPath},
+				extractMinUntill[heapID_, internalPath_] :=
+					NestWhile[
+						leftistExtractMin[lheap[heapID]]&,
+						Null,
+						!MatchQ[#, Null]\[And]!downUpEdgeQ[cent["Part", First@#], cent["Part", Last@#],
+							heapID, disj, internalPath]&,
+						{2,1}
+					];
 
-brokenTree=VertexDelete[treeEdges, currentInternalKeyPathNormal];
-bottomTree = First@ConnectedGraphComponents[brokenTree, u];
-upperTree = First@ConnectedGraphComponents[brokenTree, v];
+				tryEliminatePath[pathStack_, u_, v_] :=
+					Module[
+						{
+							edgeBase, brokenTree,
+							baseBit, bottomTree, upperTree, prevSol, curPathWeight,
+							deletedZones, curBoundaryEdges, path, pathFinal,
+							currentInternalKeyPathNormal = Normal@currentInternalKeyPath
+						},
+						
+						path = Normal[pathStack];
+						
+						brokenTree = VertexDelete[treeEdges, currentInternalKeyPathNormal];
+						bottomTree = First@ConnectedGraphComponents[brokenTree, u];
+						upperTree  = First@ConnectedGraphComponents[brokenTree, v];
 
-edgeBase = extractMinUntill[u];
+						edgeBase = extractMinUntill[u, currentInternalKeyPathNormal];
 
-(*deletedZones = (Sow[#\[LeftDoubleBracket]1\[RightDoubleBracket], "delZones"];#\[LeftDoubleBracket]2\[RightDoubleBracket])&[AbsoluteTiming[Map[If[MemberQ[Normal@currentInternalKeyPath, cent["Part", #]], #,Nothing]&, graphVertices]]];
-curBoundaryEdges = (Sow[#\[LeftDoubleBracket]1\[RightDoubleBracket], "boundEdges"];#\[LeftDoubleBracket]2\[RightDoubleBracket])&[AbsoluteTiming@Select[baseBoundaryEdges,
-Xor[
-MemberQ[deletedZones, cent["Part", First[#]]],
-MemberQ[deletedZones, cent["Part", Last[#]]]]&]];*)
+						curBoundaryEdges = Normal[boundaryEdges["Part", #]]&/@currentInternalKeyPathNormal;
+						curBoundaryEdges = Select[Flatten[Join@@curBoundaryEdges],
+												And[True,
+													Xor[
+														MemberQ[currentInternalKeyPathNormal, cent["Part", First[#]]],
+														MemberQ[currentInternalKeyPathNormal, cent["Part", Last[#]]]]
+												]
+											&];
+						pathFinal =
+							DeleteCases[
+								{voronoiBoundaryPath[edgeBase, anc, cent],
+								repairVoronoi[graph, terminals, currentInternalKeyPathNormal,
+										      dist, anc, cent, curBoundaryEdges, disj, u]},
+							Null];
 
-curBoundaryEdges = Normal[boundaryEdges["Part", #]]&/@currentInternalKeyPathNormal;
-curBoundaryEdges = Select[Flatten[Join@@curBoundaryEdges], Xor[
-MemberQ[currentInternalKeyPathNormal, cent["Part", First[#]]],
-MemberQ[currentInternalKeyPathNormal, cent["Part", Last[#]]]]&];
-Sow[curBoundaryEdges, "boundEdges"];
+						If[!MatchQ[pathFinal, {}],
+							pathFinal = SortBy[pathFinal, edgeWeightSum[graph, #]&][[1]];
+							If[edgeWeightSum[graph, pathFinal] < edgeWeightSum[graph, path],
+								prevSol = solution;
+								solution = Join[EdgeList[GraphDifference[solution, path]], pathFinal];
+								disj["Unify", u, "Forbidden"];
+								disj["Unify", #, "Forbidden"]&/@Cases[Flatten[List@@@pathFinal], x_/;VertexDegree[pathFinal, x] == 1];
+								disj["Unify", #, "Forbidden"]&/@currentInternalKeyPathNormal;
+								Sow[{prevSol, solution, "PE"}, "SolutionChange"];
+							]
+						];
+					];
 
-paths = DeleteCases[
-{voronoiBoundaryPath[edgeBase, anc, cent],
-repairVoronoi[graph, terminals, currentInternalKeyPathNormal, dist, anc, cent, curBoundaryEdges, disj, u]},
-Null];
+				dfs[v_] :=
+					Module[
+						{successors, prevCrus, path},
 
-If[!MatchQ[paths, {}], 
-paths = MinimalBy[paths, edgeWeightSum[graph, #]&][[1]];
-If[edgeWeightSum[graph, paths]< edgeWeightSum[graph, path],
-solution = Join[Complement[treeEdges, path, SameTest->(ContainsExactly[List@@#1, List@@#2]&)], paths];
-eliminatedPath = {paths, path};
-];
-];
+						successors = Normal[children["Part", v]];
 
-tabuVertices = Join[VertexList@bottomTree, Normal@currentInternalKeyPath];
+						prevCrus = Null;
+						path = Null;
 
-];
+						Scan[Function[child,
+							({prevCrus, path} = dfs[child];
+							Switch[
+								{prevCrus, crucialQ[v, treeEdges, terminals]\[And]!disj["CommonSubsetQ", v, "Forbidden"]},
+								{Null    , _}   , Nothing,
+								{_Integer, True}, (tryEliminatePath[path, prevCrus, v];
+			    								  leftistHeapMeldClearly[lheap[v], lheap[#]]&/@Normal[currentInternalKeyPath];
+			    								  currentInternalKeyPath["DropAll"];), 
+								_               , Nothing
+							];
+							If[!disj["CommonSubsetQ", #, "Forbidden"],
+								disj["Unify", v, #];]
+							;)][#]&,
+						successors];
 
-dfs[v_]:=
-Module[{successors = Normal@children["Part", v], prevCrus, path},
-prevCrus = -1;
-path = {};
-Scan[Function[child,
-({prevCrus, path} = dfs[child];
-Switch[{prevCrus, crucialQ[v, treeEdges, terminals]},
-{-1, _}, Nothing,
-{_Integer, True},
-(tryEliminatePath[path, prevCrus, v];Map[leftistHeapMeldClearly[lheap[v], lheap[#]]&, Normal@currentInternalKeyPath];
-currentInternalKeyPath["DropAll"];),
-_, Nothing];
+						Which[
+							disj["CommonSubsetQ", v, "Forbidden"],
+								currentInternalKeyPath["DropAll"];
+								{Null, {}},
+							crucialQ[v, treeEdges, terminals],
+								path = CreateDataStructure["Stack"];
+								path["Push", UndirectedEdge[v, parent["Part", v]]];
+								{v, path},
+							Length@successors == 1 \[And] !MatchQ[prevCrus, Null],
+								currentInternalKeyPath["Push", v];
+								path["Push", UndirectedEdge[v, parent["Part", v]]];
+								{prevCrus, path},
+							True,
+								{Null, {}}
+						]
+					];
 
-disj["Unify", v, #];)
-
-][#]&,
-successors];
-
-Which[
-crucialQ[v, treeEdges, terminals], {v, {UndirectedEdge@@Sort[{v, parent["Part", v]}]}},
-(Length@successors == 1 \[And] !MatchQ[prevCrus, -1]), (currentInternalKeyPath["Push", v];{prevCrus, Append[path, UndirectedEdge@@Sort[{v, parent["Part", v]}]]}),
-True, {-1, {}}
-]
-];
-
-dfs[root];
-Sow[eliminatedPath, "elimPath"];
-solution
-
-]
-]
-]
-
-
-(* ::Input::Initialization::Plain:: *)
-ClearAll[steinerKeyPathExchangeFixedPoint]
-
-steinerKeyPathExchangeFixedPoint[graph_, tree_, terminals_]:= FixedPoint[steinerKeyPathExchange[graph, #, terminals]&, tree]
-
-
-
-(* ::Input::Initialization::Plain:: *)
-ClearAll[steinerPEVIVE]
-
-steinerPEVIVE[graph_, tree_, terminals_]:=
-Composition[
-steinerVertexElimination[graph, #, terminals]&,
-steinerVertexInsertion[graph, #]&,
-steinerKeyPathExchange[graph, #, terminals]&
-][tree]
+				dfs[root];
+				Sow[Normal@disj, "keyPath"];
+				solution
+			]
+		]
+	]
 
 
+steinerKeyPathExchangeFixedPoint[graph_, tree_, terminals_] :=
+	FixedPoint[steinerKeyPathExchange[graph, #, terminals]&, tree]
 
-(* ::Input::Initialization::Plain:: *)
-ClearAll[steinerPEVIVEFixedPoint]
 
-steinerPEVIVEFixedPoint[graph_, tree_, terminals_]:= FixedPoint[steinerPEVIVE[graph, #, terminals]&, tree]
+steinerPEVIVE[graph_, tree_, terminals_] :=
+	Composition[
+		steinerVertexElimination[graph, #, terminals]&,
+		steinerVertexInsertion[graph, #]&,
+		steinerKeyPathExchange[graph, #, terminals]&
+	][tree]
+
+
+
+steinerPEVIVEFixedPoint[graph_, tree_, terminals_] :=
+	FixedPoint[steinerPEVIVE[graph, #, terminals]&, tree]
 
 
 
