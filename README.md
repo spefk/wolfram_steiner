@@ -8,7 +8,7 @@ Notebook steiners_trees.nb contains exaples of package import and couple example
 
 It is important to modify your $Path variable, addind there a path to a "packages" directory, for correct work, as it is done in .nb.
 
-### Desctiption:
+### Description:
 
 #### Steiner tree problem in graphs:
 Given graph G = (V, E) with real positive weights, and set of terminals T -- subset of V, one should find S -- a tree subgraph of G of minimal weight, containing set T.
@@ -32,7 +32,7 @@ Local-search [4]:
 2. (VE) Steiner-vertex elimination.
 3. (PE) Key-path exchange.
 
-### Some Pictures
+### Some examples
 
 Shortest path heuristic example:
 ![sph-01](https://github.com/spefk/wolfram_steiner/blob/main/visual/grid_sph.gif)
