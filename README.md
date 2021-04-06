@@ -34,11 +34,11 @@ Local-search [4]:
 
 ### Some examples
 
-Shortest path heuristic example:
+Shortest path heuristic example (gif):
 ![sph-01](https://github.com/spefk/wolfram_steiner/blob/main/visual/grid_sph.gif)
 
 
-Local-search example:
+Local-search example (gif):
 ![mehlhorn-pevive-grid-01](https://github.com/spefk/wolfram_steiner/blob/main/visual/presentation_mehlhorn_pevive_grid_01.gif)
 
 ### References
