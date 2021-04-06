@@ -32,9 +32,18 @@ Local-search [4]:
 2. (VE) Steiner-vertex elimination.
 3. (PE) Key-path exchange.
 
+### Some Pictures
+
+Shortest path heuristic example:
+![sph-01](https://github.com/spefk/wolfram_steiner/blob/main/visual/grid_sph.gif)
+
+
+Local-search example:
+![mehlhorn-pevive-grid-01](https://github.com/spefk/wolfram_steiner/blob/main/visual/presentation_mehlhorn_pevive_grid_01.gif)
+
 ### References
 
-* [0] testing data was taken from steinlib: http://steinlib.zib.de
+* [0] Datasets: http://steinlib.zib.de
 * [1] Корте Б. Комбинаторная оптимизация. Теория и Алгоритмы / Бернард Корте, Йенс Фиген ; перевод с англ. М.А. Бабенко ; - М. : МЦНМО ; 2015 - 720 с.
 * [2] Dreyfus S.  The Steiner Problem in Graphs / S. Dreyfus, R. Wagner ; 1971
 * [3] Markowski G. A fast algorithm for steiner trees / G. Markowski, L. Kou, L. Berman ; 1981.
@@ -42,6 +51,8 @@ Local-search [4]:
 * [5] Mehlhorn K. A Faster Approximation Algorithm for the Steiner Tree Problem in Graphs / K. Mehlhorn ; 1988
 
 
-author's contacts:
-email: f.kurmazov.b@gmail.com
-telegram: @spefk
+Author's contacts:
+
+Email: f.kurmazov.b@gmail.com
+
+Telegram: @spefk

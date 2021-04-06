@@ -84,22 +84,22 @@ runKouMarkowskyBerman[graph_Graph, terminals_] :=
 
 
 deleteBranches[tree_, terminals_] :=
-Block[{dfsBranches, used},
+	Block[{dfsBranches, used},
 
-	dfsBranches[vert_, prev_:Null] :=
-		Module[{successors = Complement[AdjacencyList[tree, vert], {prev}], f},
-			If[MatchQ[successors, {}],
-				If[FreeQ[terminals, vert], Sow[vert];True],
-				f = And@@(dfsBranches[#, vert]&/@successors);
-				If[f\[And]FreeQ[terminals, vert], Sow[vert];True, False]
-			]
-		];
-	
-	Composition[
-		VertexDelete[tree, #]&,
-		Flatten@#&,
-		Reap[dfsBranches[First[terminals], Null]][[2]]&
-	][]
+		dfsBranches[vert_, prev_:Null] :=
+			Module[{successors = Complement[AdjacencyList[tree, vert], {prev}], f},
+				If[MatchQ[successors, {}],
+					If[FreeQ[terminals, vert], Sow[vert];True],
+					f = And@@(dfsBranches[#, vert]&/@successors);
+					If[f\[And]FreeQ[terminals, vert], Sow[vert];True, False]
+				]
+			];
+		
+		Composition[
+			VertexDelete[tree, #]&,
+			Flatten@#&,
+			Reap[dfsBranches[First[terminals], Null]][[2]]&
+		][]
 	]
 
 
